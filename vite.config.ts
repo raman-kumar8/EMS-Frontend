@@ -4,4 +4,13 @@ import react from "@vitejs/plugin-react-swc";
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
+  resolve: {
+    alias: {
+      "@": "/src",
+    },
+  },
+  server: {
+    port: 3000, // Set the port to 3000
+    open: true, // Open the browser when the server starts
+  },
 });
