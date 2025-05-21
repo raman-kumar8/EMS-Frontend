@@ -9,6 +9,10 @@ export default {
   			md: 'calc(var(--radius) - 2px)',
   			sm: 'calc(var(--radius) - 4px)'
   		},
+		backgroundImage: {
+  ButtonPrimary: "linear-gradient(to right, #3b82f6, #8b5cf6)", // blue-500 to purple-500
+},
+
   		colors: {
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
