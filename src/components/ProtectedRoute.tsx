@@ -1,6 +1,7 @@
 import { useAuth } from "../context/AuthContext.jsx";
 import { Navigate } from "react-router-dom";
-
+import Header from "./Header.js";
+import Footer from "./Footer.js";
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
 
@@ -12,7 +13,20 @@ const ProtectedRoute = ({ children }) => {
     return <Navigate to="/login" />;
   }
 
-  return children;
+  return (
+    <div className="flex flex-col min-h-screen">
+      <Header />
+
+      {/* Main grows and pushes footer down */}
+      <main className="flex-grow min-h-[calc(100vh-160px)]">
+        {children}
+      </main>
+
+      {/* Footer with max height and responsive padding */}
+      <Footer />
+    </div>
+  );
 };
+
 
 export default ProtectedRoute;

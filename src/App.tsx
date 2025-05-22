@@ -5,6 +5,7 @@ import Login from "./pages/Login"
 import Home from "./pages/Home"
 import ProtectedRoute from "./components/ProtectedRoute"
 import PublicRoute from "./components/PublicRoute"
+import { Task } from "./pages/Task"
 const App = () => {
     return <>
    
@@ -14,6 +15,11 @@ const App = () => {
             <Home/>
         </ProtectedRoute>
       } />
+      <Route path="/task" element = {
+        <ProtectedRoute>
+            <Task/>
+        </ProtectedRoute>
+      }/>
      <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
 <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
 

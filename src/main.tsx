@@ -6,13 +6,14 @@ import ErrorBoundary from "./utils/ErrorBoundary.tsx";
 import { Toaster } from "react-hot-toast";
 import{AuthProvider} from "./context/AuthContext.jsx";
 import { BrowserRouter } from "react-router-dom";
+import Header from "./components/Header.tsx";
 createRoot(document.getElementById("root")!).render(
   <>
   <BrowserRouter>
     <Toaster position="top-right" />
     <ErrorBoundary>
       <AuthProvider>
-
+   
     <App/>
       </AuthProvider>
     </ErrorBoundary>
