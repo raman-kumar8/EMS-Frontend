@@ -16,6 +16,7 @@ import axios from "axios";
 import dayjs from "dayjs";
 import durationPlugin from "dayjs/plugin/duration";
 import toast from "react-hot-toast";
+import type { AxiosError } from "axios";
 
 dayjs.extend(durationPlugin);
 
@@ -61,8 +62,8 @@ const handleUpdate = async (status, priority, id) => {
     if (status === "COMPLETED") {
       body.endTime = dayjs().format("HH:mm:ss");
     }
-
-    await axios.put(`${import.meta.env.VITE_TASK_URL}/${id}`, body);
+        
+    await axios.put(`/tasks/update/${id}`, body);
     setEditMode(false);
     onUpdate?.();
     toast.success("Task Updated")
@@ -75,12 +76,12 @@ const handleUpdate = async (status, priority, id) => {
 };
 const handleDelete = async(id)=>{
  try {
-  const respone = await axios.delete(`${import.meta.env.VITE_TASK_URL}/delete/${id}`,{withCredentials:true});
+  const response = await axios.delete(`/tasks/delete/${id}`,{withCredentials:true});
   toast.success("Task Deleted");
   onUpdate?.();
   
- } catch (error) {
-  toast.error("Failed to Delete")
+ } catch (error:AxiosError) {
+  toast.error("Failed to Delete",error.message)
  }
 }
 
@@ -194,7 +195,7 @@ const handleDelete = async(id)=>{
                   </div>
                   <div>
                     <p className="text-xs text-gray-500 font-medium">Duration</p>
-                    <p className="text-sm font-semibold text-gray-800">{formattedDuration}</p>
+                    <p className="text-sm font-semibold text-gray-800">{task.duration}</p>
                   </div>
                 </div>
               </>

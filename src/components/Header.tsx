@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Menu, X } from "lucide-react";
+import { useAuth } from "../context/AuthContext.jsx";
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const { user, loading, logout } = useAuth(); // Make sure you have logout in your context
 
   const navLinks = [
     { name: "Home", path: "/" },
@@ -28,7 +30,7 @@ const Header = () => {
         </Link>
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex gap-10">
+        <nav className="hidden md:flex gap-10 items-center">
           {navLinks.map((link) => (
             <Link
               key={link.name}
@@ -38,6 +40,14 @@ const Header = () => {
               {link.name}
             </Link>
           ))}
+          {user && !loading && (
+            <button
+              onClick={logout} // Replace with your actual logout logic
+              className="text-white font-semibold text-lg hover:text-yellow-400 hover:underline underline-offset-4 transition duration-300"
+            >
+              Logout
+            </button>
+          )}
         </nav>
 
         {/* Mobile Menu Button */}
@@ -63,6 +73,17 @@ const Header = () => {
               {link.name}
             </Link>
           ))}
+          {user && !loading && (
+            <button
+              onClick={() => {
+                logout(); // Replace with actual logout logic
+                setIsOpen(false);
+              }}
+              className="block w-full text-left text-white font-medium text-lg hover:text-yellow-400 transition"
+            >
+              Logout
+            </button>
+          )}
         </div>
       )}
     </header>

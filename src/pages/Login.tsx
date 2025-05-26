@@ -57,24 +57,27 @@ const Login = () => {
         email: data.email,
         password: data.password,
       };
-       console.log(import.meta.env.VITE_USER_URL)
+      
 
       // Login (sets cookie)
-      await axios.post(`${import.meta.env.VITE_USER_URL}/users/login`, payload, {
+    const r1 =   await axios.post(`/users/users/login`, payload, {
         withCredentials: true,
       });
-       console.log(import.meta.env.VITE_USER_URL)
+    
+       
       // Immediately fetch user info
-      const userRes = await axios.get(`${import.meta.env.VITE_USER_URL}/general/user`, {
+      const userRes = await axios.get(`/users/general/user`, {
         withCredentials: true,
       });
+    
 
       // Update context
       setUser(userRes.data);
       toast.success("Login successful!");
       navigate("/");
     } catch (error) {
-      console.log(error)
+
+     
       toast.error(error?.response?.data?.message || "Login failed.");
     } finally {
       setIsSubmitting(false);

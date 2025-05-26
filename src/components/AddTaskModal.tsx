@@ -37,10 +37,9 @@ const AddTaskModal = ({ open, onClose, onTaskAdded,update }) => {
 
   const handleSubmit = async () => {
     try {
-      const findUserId = await axios.get(`${import.meta.env.VITE_USER_URL}/general/validate`,{withCredentials:true});
+      const findUserId = await axios.get(`/users/general/validate`,{withCredentials:true});
       const userId = findUserId.data;
-      console.log(import.meta.env.VITE_TASK_URL)
-      await axios.post(`${import.meta.env.VITE_TASK_URL}/add`, { ...form, userId },{withCredentials:true});
+      await axios.post(`tasks/add`, { ...form, userId,startTime:dayjs().format("HH:mm:ss") },{withCredentials:true});
       onTaskAdded?.();
       onClose();
       update();

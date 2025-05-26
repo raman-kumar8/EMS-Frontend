@@ -15,7 +15,7 @@ useEffect(() => {
   const fetchDetails = async () => {
     try {
       const userDetails = await axios.get(
-        `${import.meta.env.VITE_USER_URL}/general/user`,
+        `/users/general/user`,
         { withCredentials: true }
       );
       setUser(userDetails.data);
@@ -32,13 +32,14 @@ useEffect(() => {
   const logout =()=>{
     const helper  = async()=>{
       try {
-        const response = await axios.get(`${import.meta.env.VITE_USER_URL}/users/logout`,{withCredentials:true});
+        const response = await axios.get(`/users/users/logout`,{withCredentials:true});
       toast.success("logout Succesfully");
       setUser(null);
-      console.log(response);
+      localStorage.removeItem("jwt_token");
+    
       navigate("/login");
       } catch (error) {
-        console.log(error)
+        
       }
     }
     helper();

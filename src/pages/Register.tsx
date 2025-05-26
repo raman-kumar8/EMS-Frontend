@@ -81,7 +81,7 @@ const Register = () => {
         role: data.role
       };
       
-      await axios.post(`${import.meta.env.VITE_USER_URL}/users/register`, payload);
+      await axios.post(`/users/users/register`, payload);
       toast.success("Registration successful!");
       navigate("/login");
     } catch (error) {

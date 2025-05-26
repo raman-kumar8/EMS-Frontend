@@ -11,11 +11,12 @@ export const Task = () => {
 
  
   const fetchList = async () => {
+
     try {
-      const response = await axios.get(`${import.meta.env.VITE_TASK_URL}/getAll`, {
+      const response = await axios.get(`/tasks/getAll`, {
         withCredentials: true,
       });
-      
+    
       setTaskList(response.data);
     } catch (error) {
       console.error("Failed to fetch task list:", error);
@@ -45,7 +46,7 @@ export const Task = () => {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {taskList.length > 0 ? (
-          taskList.map((task) => (
+          taskList?.map((task) => (
             <TaskComponent
               key={task.id}
               task={task}
