@@ -16,7 +16,7 @@ const Header = () => {
 
   return (
     <header className="bg-gradient-to-r mb-14 from-blue-600 via-blue-500 to-blue-700 shadow-lg z-50">
-      <div className="max-w-7xl mx-auto px-6 sm:px-10 py-4 flex justify-between items-center">
+      <div className="container-fluid  px-6 sm:px-10 py-4 flex justify-between items-center">
         {/* Logo */}
         <Link to="/" className="flex items-center space-x-3">
           <img
