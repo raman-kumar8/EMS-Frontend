@@ -8,6 +8,7 @@ import PublicRoute from "./components/PublicRoute"
 import { Task } from "./pages/Task"
 import NotFound from "./pages/NotFound"
 import ReportPage from "./pages/ReportPage"
+import AboutUs from "./pages/AboutUs"
 const App = () => {
     return <>
      
@@ -25,6 +26,11 @@ const App = () => {
       <Route path="/report" element = {
         <ProtectedRoute>
             <ReportPage/>
+        </ProtectedRoute>
+      }/>
+      <Route path="/about" element={
+        <ProtectedRoute>
+          <AboutUs/>
         </ProtectedRoute>
       }/>
  
