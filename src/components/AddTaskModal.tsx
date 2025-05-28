@@ -21,15 +21,17 @@ import axios from "axios";
 import toast from "react-hot-toast";
 
 const AddTaskModal = ({ open, onClose, onTaskAdded,update }) => {
-  const [form, setForm] = useState({
-    taskName: "",
-    description: "",
-    title: "",
-    taskStatus: "PENDING",
-    priority: "MEDIUM",
-    taskTag: "",
-    startTime: dayjs().format("HH:mm:ss"),
-  });
+  const initialFormState = {
+  taskName: "",
+  description: "",
+  title: "",
+  taskStatus: "PENDING",
+  priority: "MEDIUM",
+  taskTag: "",
+  startTime: dayjs().format("HH:mm:ss"),
+};
+
+  const [form, setForm] = useState(initialFormState);
 
   const handleChange = (key, value) => {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -44,6 +46,7 @@ const AddTaskModal = ({ open, onClose, onTaskAdded,update }) => {
       onClose();
       update();
       toast.success("Task Added Succesfully")
+      setForm(initialFormState);
       
     } catch (err) {
       toast.error("Failed to Add Task`"+`${err.message}`)

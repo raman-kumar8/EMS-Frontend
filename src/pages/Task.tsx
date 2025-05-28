@@ -16,10 +16,10 @@ export const Task = () => {
       const response = await axios.get(`/tasks/getAll`, {
         withCredentials: true,
       });
-    
+       
       setTaskList(response.data);
     } catch (error) {
-      console.error("Failed to fetch task list:", error);
+     toast.error("Failed to Fetch the Task List");
     }
   };
 

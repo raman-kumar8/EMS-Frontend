@@ -4,7 +4,7 @@ import Header from "./Header.js";
 import Footer from "./Footer.js";
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
-
+   
   if (loading) {
     return <div className="text-center mt-10">Loading...</div>;
   }

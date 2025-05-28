@@ -1,5 +1,5 @@
 
-import { BrowserRouter, Route, Routes } from "react-router"
+import {  Route, Routes } from "react-router"
 import Register from './pages/Register'
 import Login from "./pages/Login"
 import Home from "./pages/Home"
@@ -7,10 +7,10 @@ import ProtectedRoute from "./components/ProtectedRoute"
 import PublicRoute from "./components/PublicRoute"
 import { Task } from "./pages/Task"
 import NotFound from "./pages/NotFound"
-import Report from "./pages/Report"
+import ReportPage from "./pages/ReportPage"
 const App = () => {
     return <>
-   
+     
      <Routes>
       <Route path='/' element = {
         <ProtectedRoute>
@@ -24,9 +24,10 @@ const App = () => {
       }/>
       <Route path="/report" element = {
         <ProtectedRoute>
-            <Report/>
+            <ReportPage/>
         </ProtectedRoute>
       }/>
+ 
       <Route path="*" element={<NotFound/>}/>
      <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
 <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />

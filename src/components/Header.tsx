@@ -24,7 +24,7 @@ const Header = () => {
             alt="Logo"
             className="bg-white rounded-full h-14 w-14 object-cover shadow-lg"
           />
-          <span className="text-3xl font-extrabold text-white tracking-wide select-none">
+          <span className="text-2xl  text-white tracking-wide select-none">
             TaskMate
           </span>
         </Link>
