@@ -1,12 +1,49 @@
 import { useAuth } from "../context/AuthContext.jsx";
 import { Button } from "@/components/ui/button.tsx";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card.tsx";
-import { Calendar, Clock, User, Briefcase, LogOut, Mail, Phone, MapPin } from "lucide-react";
+import { Calendar, Clock, User, Briefcase, LogOut, Mail, Phone, MapPin, TrendingUp, CheckCircle, BarChart3 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
+import type { AxiosError } from "axios";
+import axios from "axios";
 
 const Home = () => {
     const { user, logout } = useAuth();
+    const [userId, setUserId] = useState("");
     const navigate = useNavigate();
+    const [taskList, setTaskList] = useState([]);
+    const [report, setReportList] = useState([]);
+    const [leaves, setLeavesList] = useState([]);
+
+    const fetchTaskList = async () => {
+        try {
+            const response = await axios.get("/tasks/getAll", { withCredentials: true });
+            setTaskList(response.data);
+        } catch (error: AxiosError) {
+            toast.error(error.message);
+        }
+    }
+
+    const fetchUserIdAndReports = async () => {
+        try {
+            const { data: fetchedUserId } = await axios.get('/users/general/validate', { withCredentials: true });
+            setUserId(fetchedUserId);
+
+            const res = await axios.get(`/reports/report/user/${fetchedUserId}`, { withCredentials: true });
+            const reportsData = res.data || [];
+
+            setReportList(res.data);
+        } catch (error: any) {
+            toast.error(error?.message || 'Failed to fetch reports');
+            setReportList([]);
+        }
+    };
+
+    useEffect(() => {
+        fetchTaskList();
+        fetchUserIdAndReports();
+    }, [])
 
     const handleLogout = async () => {
         try {
@@ -20,167 +57,249 @@ const Home = () => {
         navigate(path);
     };
 
-    return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 py-10">
-            {/* Header */}
-            <div className="container mx-auto flex flex-col md:flex-row items-center justify-between mb-10 px-4">
-                <div className="flex items-center gap-6">
-                    <div className="h-20 w-20 rounded-full bg-blue-200 flex items-center justify-center shadow-lg border-4 border-white">
-                        {user?.avatar ? (
-                            <img src={user.avatar} alt="Avatar" className="h-full w-full rounded-full object-cover" />
-                        ) : (
-                            <User className="h-12 w-12 text-blue-600" />
-                        )}
-                    </div>
-                    <div>
-                        <h1 className="text-3xl md:text-4xl font-extrabold text-blue-800 mb-1">
-                            Welcome back, {user?.name || 'User'}!
-                        </h1>
-                        <p className="text-blue-500 text-lg">Manage your tasks, leaves, and reports</p>
-                    </div>
-                </div>
-                <Button
-                    className="mt-6 md:mt-0 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl shadow-md"
-                    onClick={handleLogout}
-                >
-                    <LogOut className="mr-2 h-5 w-5" /> Logout
-                </Button>
-            </div>
+    const completedTasks = taskList?.filter((t) => t.taskStatus === "COMPLETED").length || 0;
+    const pendingTasks = taskList?.length - completedTasks || 0;
+    const completionRate = taskList?.length > 0 ? Math.round((completedTasks / taskList.length) * 100) : 0;
 
-            <div className="container grid grid-cols-1 lg:grid-cols-3 gap-8 px-4">
-                {/* User Details Card */}
-                <div className="lg:col-span-1">
-                    <Card className="shadow-xl border-blue-100">
-                        <CardHeader>
-                            <div className="flex flex-col items-center gap-3">
-                                <div className="h-28 w-28 rounded-full bg-blue-100 flex items-center justify-center shadow border-4 border-blue-200">
+    return (
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
+            {/* Clean Header Section */}
+            <div className="bg-white border-b border-gray-200 shadow-sm">
+                <div className="container mx-auto px-6 py-6">
+                    <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+                        <div className="flex items-center gap-6">
+                            <div className="relative">
+                                <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center shadow-lg">
                                     {user?.avatar ? (
-                                        <img src={user.avatar} alt="Avatar" className="h-full w-full rounded-full object-cover" />
+                                        <img src={user.avatar} alt="Avatar" className="h-full w-full rounded-2xl object-cover" />
                                     ) : (
-                                        <User className="h-14 w-14 text-blue-600" />
+                                        <User className="h-8 w-8 text-white" />
                                     )}
                                 </div>
-                                <h2 className="text-2xl font-bold text-blue-900 mt-2">{user?.name || 'User Name'}</h2>
-                                <p className="text-blue-500">{user?.department || 'Department'}</p>
+                                <div className="absolute -bottom-1 -right-1 h-4 w-4 bg-green-500 rounded-full border-2 border-white"></div>
                             </div>
-                        </CardHeader>
-                        <CardContent className="space-y-4 mt-2">
-                            <div className="flex items-center gap-3 text-blue-700">
-                                <Mail className="h-5 w-5" />
-                                <span>{user?.email || 'user@example.com'}</span>
+                            <div>
+                                <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">
+                                    Good morning, <span className="text-blue-600">{user?.name || 'User'}</span>
+                                </h1>
+                                <p className="text-gray-600 font-medium mt-1">Ready to tackle today's challenges?</p>
                             </div>
-                            <div className="flex items-center gap-3 text-blue-700">
-                                <Phone className="h-5 w-5" />
-                                <span>{user?.phone || '+1 (555) 000-0000'}</span>
-                            </div>
-                            <div className="flex items-start gap-3 text-blue-700">
-                                <MapPin className="h-5 w-5 mt-0.5" />
-                                <span>{user?.address || '123 Main St, City, Country'}</span>
-                            </div>
-                        </CardContent>
-                    </Card>
+                        </div>
+                        <Button
+                            className="bg-gray-900 hover:bg-gray-800 text-white px-6 py-2.5 rounded-lg shadow-md transition-all duration-200 font-semibold"
+                            onClick={handleLogout}
+                        >
+                            <LogOut className="mr-2 h-4 w-4" /> Sign Out
+                        </Button>
+                    </div>
                 </div>
+            </div>
 
-                {/* Quick Actions & Stats */}
-                <div className="lg:col-span-2 space-y-8">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        {/* Tasks Card */}
-                        <Card
-                            className="hover:shadow-2xl transition-shadow cursor-pointer border-blue-100"
-                            onClick={() => navigateTo('/task')}
-                        >
-                            <CardHeader className="pb-2">
-                                <div className="flex items-center justify-between">
-                                    <CardTitle className="text-lg text-blue-700">Tasks</CardTitle>
-                                    <div className="p-2 rounded-lg bg-blue-100">
-                                        <Briefcase className="h-5 w-5 text-blue-600" />
+            <div className="container mx-auto px-6 py-8">
+                <div className="grid grid-cols-1 xl:grid-cols-5 gap-8">
+                    {/* Sleek User Profile Card */}
+                    <div className="xl:col-span-1">
+                        <Card className="shadow-lg border-0 bg-white overflow-hidden">
+                            <CardHeader className="bg-gradient-to-br from-gray-50 to-gray-100 pb-6">
+                                <div className="flex flex-col items-center">
+                                    <div className="h-20 w-20 rounded-2xl bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center shadow-lg">
+                                        {user?.avatar ? (
+                                            <img src={user.avatar} alt="Avatar" className="h-full w-full rounded-2xl object-cover" />
+                                        ) : (
+                                            <User className="h-10 w-10 text-white" />
+                                        )}
                                     </div>
+                                    <h2 className="text-lg font-bold text-gray-900 mt-4">{user?.name || 'User Name'}</h2>
+                                    <p className="text-blue-600 font-semibold text-sm">{user?.department || 'Department'}</p>
                                 </div>
-                                <CardDescription>Manage your tasks and deadlines</CardDescription>
                             </CardHeader>
-                            <CardContent>
-                                <div className="text-2xl font-bold text-blue-900">12 Active</div>
-                                <p className="text-sm text-blue-400">3 due this week</p>
+                            <CardContent className="space-y-3 p-6">
+                                <div className="flex items-center gap-3 text-gray-700 p-3 rounded-lg bg-gray-50">
+                                    <Mail className="h-4 w-4 text-gray-500" />
+                                    <span className="text-sm font-medium truncate">{user?.email || 'user@example.com'}</span>
+                                </div>
+                                <div className="flex items-center gap-3 text-gray-700 p-3 rounded-lg bg-gray-50">
+                                    <Phone className="h-4 w-4 text-gray-500" />
+                                    <span className="text-sm font-medium">{user?.phone || '+1 (555) 000-0000'}</span>
+                                </div>
+                                <div className="flex items-start gap-3 text-gray-700 p-3 rounded-lg bg-gray-50">
+                                    <MapPin className="h-4 w-4 text-gray-500 mt-0.5 flex-shrink-0" />
+                                    <span className="text-sm font-medium">{user?.address || '123 Main St, City, Country'}</span>
+                                </div>
                             </CardContent>
                         </Card>
+                    </div>
 
-                        {/* Leave Card */}
-                        <Card
-                            className="hover:shadow-2xl transition-shadow cursor-pointer border-green-100"
-                            onClick={() => navigateTo('/leave')}
-                        >
-                            <CardHeader className="pb-2">
-                                <div className="flex items-center justify-between">
-                                    <CardTitle className="text-lg text-green-700">Leaves</CardTitle>
-                                    <div className="p-2 rounded-lg bg-green-100">
-                                        <Calendar className="h-5 w-5 text-green-600" />
+                    {/* Main Dashboard */}
+                    <div className="xl:col-span-4">
+                        {/* Quick Stats Row */}
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                            <div className="bg-white rounded-xl p-6 shadow-lg border border-gray-100">
+                                <div className="flex items-center gap-4">
+                                    <div className="p-3 rounded-lg bg-blue-50">
+                                        <Briefcase className="h-6 w-6 text-blue-600" />
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-medium text-gray-600">Total Tasks</p>
+                                        <p className="text-2xl font-bold text-gray-900">{taskList?.length || 0}</p>
                                     </div>
                                 </div>
-                                <CardDescription>Manage your leave requests</CardDescription>
+                            </div>
+                            
+                            <div className="bg-white rounded-xl p-6 shadow-lg border border-gray-100">
+                                <div className="flex items-center gap-4">
+                                    <div className="p-3 rounded-lg bg-green-50">
+                                        <CheckCircle className="h-6 w-6 text-green-600" />
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-medium text-gray-600">Completed</p>
+                                        <p className="text-2xl font-bold text-gray-900">{completedTasks}</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="bg-white rounded-xl p-6 shadow-lg border border-gray-100">
+                                <div className="flex items-center gap-4">
+                                    <div className="p-3 rounded-lg bg-yellow-50">
+                                        <Calendar className="h-6 w-6 text-yellow-600" />
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-medium text-gray-600">Leave Balance</p>
+                                        <p className="text-2xl font-bold text-gray-900">12</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="bg-white rounded-xl p-6 shadow-lg border border-gray-100">
+                                <div className="flex items-center gap-4">
+                                    <div className="p-3 rounded-lg bg-purple-50">
+                                        <BarChart3 className="h-6 w-6 text-purple-600" />
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-medium text-gray-600">Reports</p>
+                                        <p className="text-2xl font-bold text-gray-900">{report?.length || 0}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Main Action Cards */}
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                            {/* Tasks Card */}
+                            <Card
+                                className="group hover:shadow-xl transition-all duration-300 cursor-pointer bg-white border border-gray-200 hover:border-blue-300 overflow-hidden"
+                                onClick={() => navigateTo('/task')}
+                            >
+                                <CardHeader className="pb-4">
+                                    <div className="flex items-center justify-between">
+                                        <div className="p-3 rounded-xl bg-gradient-to-br from-blue-600 to-blue-700 shadow-lg group-hover:scale-105 transition-transform duration-200">
+                                            <Briefcase className="h-8 w-8 text-white" />
+                                        </div>
+                                        <div className="text-right">
+                                            <div className="text-3xl font-bold text-gray-900">{taskList?.length || 0}</div>
+                                            <div className="text-sm text-gray-500">Active Tasks</div>
+                                        </div>
+                                    </div>
+                                </CardHeader>
+                                <CardContent>
+                                    <CardTitle className="text-xl font-bold text-gray-900 mb-2">Task Management</CardTitle>
+                                    <CardDescription className="text-gray-600 mb-4">
+                                        Organize and track your daily assignments
+                                    </CardDescription>
+                                    <div className="flex items-center justify-between text-sm">
+                                        <span className="text-green-600 font-semibold">{completedTasks} completed</span>
+                                        <span className="text-blue-600 font-semibold">{completionRate}% done</span>
+                                    </div>
+                                </CardContent>
+                            </Card>
+
+                            {/* Leave Card */}
+                            <Card
+                                className="group hover:shadow-xl transition-all duration-300 cursor-pointer bg-white border border-gray-200 hover:border-yellow-300 overflow-hidden"
+                                onClick={() => navigateTo('/leave')}
+                            >
+                                <CardHeader className="pb-4">
+                                    <div className="flex items-center justify-between">
+                                        <div className="p-3 rounded-xl bg-gradient-to-br from-yellow-400 to-yellow-500 shadow-lg group-hover:scale-105 transition-transform duration-200">
+                                            <Calendar className="h-8 w-8 text-white" />
+                                        </div>
+                                        <div className="text-right">
+                                            <div className="text-3xl font-bold text-gray-900">12</div>
+                                            <div className="text-sm text-gray-500">Days Left</div>
+                                        </div>
+                                    </div>
+                                </CardHeader>
+                                <CardContent>
+                                    <CardTitle className="text-xl font-bold text-gray-900 mb-2">Leave Management</CardTitle>
+                                    <CardDescription className="text-gray-600 mb-4">
+                                        Plan your time off and manage requests
+                                    </CardDescription>
+                                    <div className="flex items-center justify-between text-sm">
+                                        <span className="text-orange-600 font-semibold">2 pending</span>
+                                        <span className="text-gray-500">Updated today</span>
+                                    </div>
+                                </CardContent>
+                            </Card>
+
+                            {/* Reports Card */}
+                            <Card
+                                className="group hover:shadow-xl transition-all duration-300 cursor-pointer bg-white border border-gray-200 hover:border-purple-300 overflow-hidden"
+                                onClick={() => navigateTo('/report')}
+                            >
+                                <CardHeader className="pb-4">
+                                    <div className="flex items-center justify-between">
+                                        <div className="p-3 rounded-xl bg-gradient-to-br from-purple-600 to-purple-700 shadow-lg group-hover:scale-105 transition-transform duration-200">
+                                            <TrendingUp className="h-8 w-8 text-white" />
+                                        </div>
+                                        <div className="text-right">
+                                            <div className="text-3xl font-bold text-gray-900">{report?.length || 0}</div>
+                                            <div className="text-sm text-gray-500">Reports</div>
+                                        </div>
+                                    </div>
+                                </CardHeader>
+                                <CardContent>
+                                    <CardTitle className="text-xl font-bold text-gray-900 mb-2">Analytics & Reports</CardTitle>
+                                    <CardDescription className="text-gray-600 mb-4">
+                                        Insights and performance analytics
+                                    </CardDescription>
+                                    <div className="flex items-center justify-between text-sm">
+                                        <span className="text-green-600 font-semibold">All current</span>
+                                        <span className="text-gray-500">Last updated</span>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        </div>
+
+                        {/* Performance Summary */}
+                        <Card className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white shadow-xl border-0">
+                            <CardHeader>
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <CardTitle className="text-2xl font-bold text-white">Weekly Summary</CardTitle>
+                                        <CardDescription className="text-gray-300 font-medium">Your performance this week</CardDescription>
+                                    </div>
+                                    <div className="p-3 rounded-xl bg-blue-600 shadow-lg">
+                                        <TrendingUp className="h-6 w-6 text-white" />
+                                    </div>
+                                </div>
                             </CardHeader>
                             <CardContent>
-                                <div className="text-2xl font-bold text-green-900">12 Days Left</div>
-                                <p className="text-sm text-green-400">2 pending requests</p>
-                            </CardContent>
-                        </Card>
-
-                        {/* Reports Card */}
-                        <Card
-                            className="hover:shadow-2xl transition-shadow cursor-pointer border-purple-100"
-                            onClick={() => navigateTo('/report')}
-                        >
-                            <CardHeader className="pb-2">
-                                <div className="flex items-center justify-between">
-                                    <CardTitle className="text-lg text-purple-700">Reports</CardTitle>
-                                    <div className="p-2 rounded-lg bg-purple-100">
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            width="20"
-                                            height="20"
-                                            viewBox="0 0 24 24"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            strokeWidth="2"
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            className="text-purple-600"
-                                        >
-                                            <path d="M21 11V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h6" />
-                                            <path d="m12 12 4 4 6-6" />
-                                            <path d="m16 5 3 3" />
-                                        </svg>
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                    <div className="text-center p-4 rounded-xl bg-white/10 backdrop-blur-sm">
+                                        <div className="text-3xl font-bold text-blue-400 mb-2">{completionRate}%</div>
+                                        <div className="text-white font-semibold">Completion Rate</div>
+                                        <div className="text-gray-300 text-sm mt-1">Tasks finished on time</div>
                                     </div>
-                                </div>
-                                <CardDescription>View and generate reports</CardDescription>
-                            </CardHeader>
-                            <CardContent>
-                                <div className="text-2xl font-bold text-purple-900">5 Reports</div>
-                                <p className="text-sm text-purple-400">Last updated today</p>
-                            </CardContent>
-                        </Card>
-
-                        {/* Quick Stats Card */}
-                        <Card className="border-amber-100">
-                            <CardHeader className="pb-2">
-                                <div className="flex items-center justify-between">
-                                    <CardTitle className="text-lg text-amber-700">Quick Stats</CardTitle>
-                                    <div className="p-2 rounded-lg bg-amber-100">
-                                        <Clock className="h-5 w-5 text-amber-600" />
+                                    <div className="text-center p-4 rounded-xl bg-white/10 backdrop-blur-sm">
+                                        <div className="text-3xl font-bold text-yellow-400 mb-2">{pendingTasks}</div>
+                                        <div className="text-white font-semibold">Pending Tasks</div>
+                                        <div className="text-gray-300 text-sm mt-1">Due this week</div>
                                     </div>
-                                </div>
-                            </CardHeader>
-                            <CardContent className="space-y-3">
-                                <div className="flex justify-between items-center">
-                                    <span className="text-sm text-amber-700">Tasks Completed</span>
-                                    <span className="font-medium">24/36</span>
-                                </div>
-                                <div className="flex justify-between items-center">
-                                    <span className="text-sm text-amber-700">Leaves This Month</span>
-                                    <span className="font-medium">2/3</span>
-                                </div>
-                                <div className="flex justify-between items-center">
-                                    <span className="text-sm text-amber-700">Upcoming Deadlines</span>
-                                    <span className="font-medium">3</span>
+                                    <div className="text-center p-4 rounded-xl bg-white/10 backdrop-blur-sm">
+                                        <div className="text-3xl font-bold text-green-400 mb-2">2</div>
+                                        <div className="text-white font-semibold">Days Off Used</div>
+                                        <div className="text-gray-300 text-sm mt-1">This month</div>
+                                    </div>
                                 </div>
                             </CardContent>
                         </Card>
