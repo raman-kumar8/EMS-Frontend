@@ -37,7 +37,11 @@ const Login = () => {
   
   useEffect(() => {
     if (!loading && user) {
-      navigate("/"); // Already logged in, go to home
+      if (user.role=="admin") {
+  navigate("/admin");
+} else {
+  navigate("/");
+}
     }
   }, [user, loading, navigate]);
   
@@ -74,7 +78,18 @@ const Login = () => {
       // Update context
       setUser(userRes.data);
       toast.success("Login successful!");
-      navigate("/");
+      
+
+
+// Redirect based on role
+if (userRes.data.role == "admin") {
+  navigate("/admin");
+} else {
+  navigate("/");
+}
+    
+
+
     } catch (error) {
 
      
