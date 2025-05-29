@@ -65,7 +65,7 @@ const Home = () => {
         <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
             {/* Clean Header Section */}
             <div className="bg-white border-b border-gray-200 shadow-sm">
-                <div className="container mx-auto px-6 py-6">
+                <div className="container-fluid mx-auto px-6 py-6">
                     <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
                         <div className="flex items-center gap-6">
                             <div className="relative">
@@ -85,17 +85,12 @@ const Home = () => {
                                 <p className="text-gray-600 font-medium mt-1">Ready to tackle today's challenges?</p>
                             </div>
                         </div>
-                        <Button
-                            className="bg-gray-900 hover:bg-gray-800 text-white px-6 py-2.5 rounded-lg shadow-md transition-all duration-200 font-semibold"
-                            onClick={handleLogout}
-                        >
-                            <LogOut className="mr-2 h-4 w-4" /> Sign Out
-                        </Button>
+                        
                     </div>
                 </div>
             </div>
 
-            <div className="container mx-auto px-6 py-8">
+            <div className="container-fluid mx-auto px-6 py-8">
                 <div className="grid grid-cols-1 xl:grid-cols-5 gap-8">
                     {/* Sleek User Profile Card */}
                     <div className="xl:col-span-1">
@@ -134,7 +129,7 @@ const Home = () => {
                     <div className="xl:col-span-4">
                         {/* Quick Stats Row */}
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                            <div className="bg-white rounded-xl p-6 shadow-lg border border-gray-100">
+                            <div className="bg-white rounded-xl p-6 shadow-lg border border-gray-100 rounded-xl shadow p-6 group hover:shadow-xl transition-all duration-300  bg-white border border-gray-200 hover:border-blue-300 overflow-hidden">
                                 <div className="flex items-center gap-4">
                                     <div className="p-3 rounded-lg bg-blue-50">
                                         <Briefcase className="h-6 w-6 text-blue-600" />
@@ -146,7 +141,7 @@ const Home = () => {
                                 </div>
                             </div>
                             
-                            <div className="bg-white rounded-xl p-6 shadow-lg border border-gray-100">
+                            <div className="bg-white rounded-xl p-6 shadow-lg border border-gray-100 rounded-xl shadow p-6 group hover:shadow-xl transition-all duration-300  bg-white border border-gray-200 hover:border-purple-300 overflow-hidden">
                                 <div className="flex items-center gap-4">
                                     <div className="p-3 rounded-lg bg-green-50">
                                         <CheckCircle className="h-6 w-6 text-green-600" />
@@ -158,7 +153,7 @@ const Home = () => {
                                 </div>
                             </div>
 
-                            <div className="bg-white rounded-xl p-6 shadow-lg border border-gray-100">
+                            <div className="bg-white rounded-xl p-6 shadow-lg border border-gray-100 rounded-xl shadow p-6 group hover:shadow-xl transition-all duration-300  bg-white border border-gray-200 hover:border-yellow-300 overflow-hidden">
                                 <div className="flex items-center gap-4">
                                     <div className="p-3 rounded-lg bg-yellow-50">
                                         <Calendar className="h-6 w-6 text-yellow-600" />
@@ -170,7 +165,7 @@ const Home = () => {
                                 </div>
                             </div>
 
-                            <div className="bg-white rounded-xl p-6 shadow-lg border border-gray-100">
+                            <div className="bg-white rounded-xl p-6 shadow-lg border border-gray-100 rounded-xl shadow p-6 group hover:shadow-xl transition-all duration-300  bg-white border border-gray-200 hover:border-purple-300 overflow-hidden">
                                 <div className="flex items-center gap-4">
                                     <div className="p-3 rounded-lg bg-purple-50">
                                         <BarChart3 className="h-6 w-6 text-purple-600" />
