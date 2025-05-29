@@ -37,7 +37,7 @@ const Login = () => {
   
   useEffect(() => {
     if (!loading && user) {
-      if (user.data.role?.role == "Admin") {
+      if (user.role=="admin") {
   navigate("/admin");
 } else {
   navigate("/");
@@ -82,7 +82,7 @@ const Login = () => {
 
 
 // Redirect based on role
-if (userRes.data.role?.role == "Admin") {
+if (userRes.data.role == "admin") {
   navigate("/admin");
 } else {
   navigate("/");
