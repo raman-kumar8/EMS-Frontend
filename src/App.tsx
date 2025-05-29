@@ -9,9 +9,6 @@ import { Task } from "./pages/Task"
 import NotFound from "./pages/NotFound"
 import ReportPage from "./pages/ReportPage"
 import AboutUs from "./pages/AboutUs"
-import HomeTemp1 from "@/pages/HomeTemp1.tsx";
-import HomeTemp2 from "@/pages/HomeTemp2.tsx";
-import Leave from "@/pages/Leave.tsx";
 const App = () => {
     return <>
      
