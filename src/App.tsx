@@ -9,15 +9,39 @@ import { Task } from "./pages/Task"
 import NotFound from "./pages/NotFound"
 import ReportPage from "./pages/ReportPage"
 import AboutUs from "./pages/AboutUs"
+import HomeTemp1 from "@/pages/HomeTemp1.tsx";
+import HomeTemp2 from "@/pages/HomeTemp2.tsx";
+import Leave from "@/pages/Leave.tsx";
 const App = () => {
     return <>
      
      <Routes>
+
       <Route path='/' element = {
         <ProtectedRoute>
             <Home/>
         </ProtectedRoute>
       } />
+
+       <Route path='/leave' element = {
+         <ProtectedRoute>
+           <Leave />
+         </ProtectedRoute>
+       } />
+
+
+       <Route path='/home1' element = {
+         <ProtectedRoute>
+           <HomeTemp1/>
+         </ProtectedRoute>
+       } />
+
+       <Route path='/home2' element = {
+         <ProtectedRoute>
+           <HomeTemp2/>
+         </ProtectedRoute>
+       } />
+
       <Route path="/task" element = {
         <ProtectedRoute>
             <Task/>
