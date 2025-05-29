@@ -23,25 +23,6 @@ const App = () => {
         </ProtectedRoute>
       } />
 
-       <Route path='/leave' element = {
-         <ProtectedRoute>
-           <Leave />
-         </ProtectedRoute>
-       } />
-
-
-       <Route path='/home1' element = {
-         <ProtectedRoute>
-           <HomeTemp1/>
-         </ProtectedRoute>
-       } />
-
-       <Route path='/home2' element = {
-         <ProtectedRoute>
-           <HomeTemp2/>
-         </ProtectedRoute>
-       } />
-
       <Route path="/task" element = {
         <ProtectedRoute>
             <Task/>
