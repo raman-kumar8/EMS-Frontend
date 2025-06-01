@@ -9,21 +9,16 @@ import { Task } from "./pages/Task"
 import NotFound from "./pages/NotFound"
 import ReportPage from "./pages/ReportPage"
 import AboutUs from "./pages/AboutUs"
-import Admin from "./pages/Admin"
-import AdminRoute from "./components/AdminRoute"
+
+
 
 
 const App = () => {
     return <>
-     
-     <Routes>
-      {/* Admin route without header/footer */}
-      <Route path="/admin" element={
-        <AdminRoute>
-          <Admin />
-        </AdminRoute>
-      } />
 
+
+   
+<Routes>
 
       <Route path='/' element = {
         <ProtectedRoute>

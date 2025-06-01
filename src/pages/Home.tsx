@@ -1,6 +1,8 @@
 
 import {useAuth} from "../context/AuthContext.jsx";
 import { Button } from "@/components/ui/button.js";
+import Admin from "./Admin";
+import HomePage from "./HomePage.tsx";
 const Home = () => {
 // useEffect(()=>{
 //  const helper = async()=>{
@@ -18,15 +20,26 @@ const Home = () => {
 //  helper();
 // },[])
 const {user,logout} =useAuth();
-  return (
-    <div>
-        {user?.email}
-        <br />
-        <Button className=" space-x-4 space-y-4 mt-8" onClick={()=>{
-            logout();
-        }}>Logou</Button>
-    </div>
-  )
+if(!user) {
+  return <div>Loading or not logged in....</div>; 
 }
 
-export default Home
+return(
+  <div>
+    {user.role === "admin" ? (
+      <Admin/>):(
+        <div>
+          <HomePage user={user} logout={logout} />
+
+        </div>
+      )}
+    
+
+  </div>
+);
+
+};
+
+
+
+export default Home;
