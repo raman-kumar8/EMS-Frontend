@@ -7,14 +7,16 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import type { AxiosError } from "axios";
 import axios from "axios";
+import UpdateUserModal from "@/components/UpdateUserModal.tsx";
 
 const Home = () => {
-    const { user, logout } = useAuth();
+    const { user, logout , fetchDetails } = useAuth();
     const [userId, setUserId] = useState("");
     const navigate = useNavigate();
     const [taskList, setTaskList] = useState([]);
     const [report, setReportList] = useState([]);
     const [leaves, setLeavesList] = useState([]);
+    const [showModal, setShowModal] = useState(false);
 
     const fetchTaskList = async () => {
         try {
@@ -85,7 +87,7 @@ const Home = () => {
                                 <p className="text-gray-600 font-medium mt-1">Ready to tackle today's challenges?</p>
                             </div>
                         </div>
-                        
+
                     </div>
                 </div>
             </div>
@@ -105,7 +107,7 @@ const Home = () => {
                                         )}
                                     </div>
                                     <h2 className="text-lg font-bold text-gray-900 mt-4">{user?.name || 'User Name'}</h2>
-                                    <p className="text-blue-600 font-semibold text-sm">{user?.department || 'Department'}</p>
+                                    <p className="text-blue-600 font-semibold text-sm">{user?.role || 'Department'}</p>
                                 </div>
                             </CardHeader>
                             <CardContent className="space-y-3 p-6">
@@ -121,7 +123,19 @@ const Home = () => {
                                     <MapPin className="h-4 w-4 text-gray-500 mt-0.5 flex-shrink-0" />
                                     <span className="text-sm font-medium">{user?.address || '123 Main St, City, Country'}</span>
                                 </div>
+
+                                {/* Edit Profile Button */}
+                                <div className="pt-4">
+                                    <Button
+                                      onClick={() => setShowModal(true)}
+                                      className="w-full bg-blue-600 text-white hover:bg-blue-700"
+                                    >
+                                        Edit Profile
+                                    </Button>
+                                </div>
+                                
                             </CardContent>
+
                         </Card>
                     </div>
 
@@ -140,7 +154,7 @@ const Home = () => {
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <div className="bg-white rounded-xl p-6 shadow-lg border border-gray-100 rounded-xl shadow p-6 group hover:shadow-xl transition-all duration-300  bg-white border border-gray-200 hover:border-purple-300 overflow-hidden">
                                 <div className="flex items-center gap-4">
                                     <div className="p-3 rounded-lg bg-green-50">
@@ -160,7 +174,7 @@ const Home = () => {
                                     </div>
                                     <div>
                                         <p className="text-sm font-medium text-gray-600">Leave Balance</p>
-                                        <p className="text-2xl font-bold text-gray-900">12</p>
+                                        <p className="text-2xl font-bold text-gray-900">{user.leaveCount}</p>
                                     </div>
                                 </div>
                             </div>
@@ -219,7 +233,7 @@ const Home = () => {
                                             <Calendar className="h-8 w-8 text-white" />
                                         </div>
                                         <div className="text-right">
-                                            <div className="text-3xl font-bold text-gray-900">12</div>
+                                            <div className="text-3xl font-bold text-gray-900">{user.leaveCount}</div>
                                             <div className="text-sm text-gray-500">Days Left</div>
                                         </div>
                                     </div>
@@ -230,7 +244,7 @@ const Home = () => {
                                         Plan your time off and manage requests
                                     </CardDescription>
                                     <div className="flex items-center justify-between text-sm">
-                                        <span className="text-orange-600 font-semibold">2 pending</span>
+                                        <span className="text-orange-600 font-semibold"></span>
                                         <span className="text-gray-500">Updated today</span>
                                     </div>
                                 </CardContent>
@@ -291,7 +305,7 @@ const Home = () => {
                                         <div className="text-gray-300 text-sm mt-1">Due this week</div>
                                     </div>
                                     <div className="text-center p-4 rounded-xl bg-white/10 backdrop-blur-sm">
-                                        <div className="text-3xl font-bold text-green-400 mb-2">2</div>
+                                        <div className="text-3xl font-bold text-green-400 mb-2">{25 - user.leaveCount}</div>
                                         <div className="text-white font-semibold">Days Off Used</div>
                                         <div className="text-gray-300 text-sm mt-1">This month</div>
                                     </div>
@@ -301,8 +315,15 @@ const Home = () => {
                     </div>
                 </div>
             </div>
+            <UpdateUserModal
+              open={showModal}
+              onClose={() => setShowModal(false)}
+              onUpdateSuccess={fetchDetails} // optional: refetch data after update
+            />
         </div>
-    );
+    
+
+);
 };
 
 export default Home;

@@ -32,6 +32,11 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: path => path.replace(/^\/reports/, '/api/v1'),
       },
+      '/leaves': {
+        target: 'http://ems-leave:8081',
+        changeOrigin: true,
+        rewrite: path => path.replace(/^\/leaves/, '/api/v1'),
+      },
       // Add this for websocket proxying:
         '/ws': {
     target: 'http://ems-report:8080',

@@ -133,7 +133,7 @@ const Login = () => {
                     <FormItem>
                       <div className="flex items-center justify-between">
                         <FormLabel className="text-sm font-medium text-gray-700">Password</FormLabel>
-                        <a href="#" className="text-xs font-medium text-indigo-600 hover:text-indigo-500">
+                        <a onClick={()=>navigate("/forget")} href="#" className="text-xs font-medium text-indigo-600 hover:text-indigo-500">
                           Forgot password?
                         </a>
                       </div>
