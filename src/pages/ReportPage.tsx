@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import GenerateReportModal from '../components/GenerateReportModal';
 import ReportCard from '@/components/ReportCard';
-import { Client, Stomp } from '@stomp/stompjs';
-import SockJS from 'sockjs-client';
+import Pusher from 'pusher-js';
 import {
   FileText, Download, Calendar, Clock, User, Filter, Search, Plus, Trash2,
   Eye, AlertCircle, CheckCircle, Loader, RefreshCw, BarChart3, TrendingUp, FileBarChart
@@ -36,7 +35,7 @@ const ReportPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('ALL');
   const [generatingReport, setGeneratingReport] = useState(false);
-
+  const pusherRef = useRef<Pusher | null>(null);
 
 
 
@@ -59,12 +58,50 @@ const fetchUserIdAndReports = async () => {
     setLoading(false);
   }
 };
+const fetchReport = async ()=>{
+  try {
+    const res = await axios.get(`/reports/report/user/${userId}`, { withCredentials: true });
+    const reportsData = res.data || [];
+   
+    setReports(reportsData);
+  } catch (error) {
+    toast.error(error.message);
+  }
+}
   useEffect(() => {
    
 
 
     fetchUserIdAndReports();
   }, []);
+ 
+
+useEffect(() => {
+  if (!userId) return;
+
+  // Avoid multiple instances
+  if (pusherRef.current) {
+    pusherRef.current.disconnect();
+  }
+
+  const pusher = new Pusher('efcc8add46abbc13e80b', {
+    cluster: 'ap2',
+  });
+
+  const channel = pusher.subscribe(`user-${userId}`);
+  channel.bind('report-status-update', (data: any) => {
+    console.log('Report status update received:', data);
+    fetchReport();
+  });
+
+  pusherRef.current = pusher;
+
+  return () => {
+    channel.unbind_all();
+    channel.unsubscribe();
+    pusher.disconnect();
+  };
+}, [userId]);
  const handleDelete = async(reportId)=>{
   try {
         
