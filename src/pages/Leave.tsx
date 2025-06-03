@@ -1,55 +1,70 @@
-import React, { useEffect, useState } from "react";
+import  { useEffect, useState } from "react";
 import LeaveComponent from "../components/LeaveComponent";
 import AddLeaveModal from "../components/AddLeaveModal";
 import { Button } from "@/components/ui/button";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { useAuth } from "../context/AuthContext.jsx";
+import { useAuth } from "../context/AuthContext.js";
+
+import type Leave from "@/interfaces/Leave.js";
+
+
+// Type for the enriched leave item
+interface EnrichedLeave extends Leave {
+  employeeName: string;
+  employeeEmail: string;
+  employeeRole: string;
+}
+
+// Admin response structure (if not already defined in your project)
+interface AdminUserResponse {
+  userDetails: {
+    name: string;
+    email: string;
+    role: string;
+  };
+  responseListDTOList: Leave[]; // List of leave entries
+}
 
 export const Leave = () => {
-  const {user} = useAuth();
-  const [showModal, setShowModal] = useState(false);
-  const [leaveList, setLeaveList] = useState([]);
+  const { user } = useAuth();
+  const [showModal, setShowModal] = useState<boolean>(false);
+  const [leaveList, setLeaveList] = useState<EnrichedLeave[]>([]);
 
-
-  const fetchLeaveList = async () => {
+  const fetchLeaveList = async (): Promise<void> => {
     try {
-      let response;
-      let allLeaves = [];
+      let allLeaves: EnrichedLeave[] = [];
 
-      if (user.role === "admin") {
-        response = await axios.get(`leaves/admin/getAll`
-          //http://localhost:8083/api/v1/admin/getAll
-          , {
-          withCredentials: true,
-        });
+      if (user?.role === "admin") {
+        const response = await axios.get<AdminUserResponse[]>(
+          `leaves/admin/getAll`,
+          { withCredentials: true }
+        );
 
-        // Flatten each user's leaves and attach their info to each leave
-        allLeaves = response.data.flatMap(user =>
-          (user.responseListDTOList || []).map(leave => ({
+        // Flatten and enrich each leave with user info
+        allLeaves = response.data.flatMap((adminUser) =>
+          (adminUser.responseListDTOList || []).map((leave) => ({
             ...leave,
-            employeeName: user.userDetails.name,
-            employeeEmail: user.userDetails.email,
-            employeeRole: user.userDetails.role
+            employeeName: adminUser.userDetails.name,
+            employeeEmail: adminUser.userDetails.email,
+            employeeRole: adminUser.userDetails.role,
           }))
         );
       } else {
-        response = await axios.get(`leaves/leave/getAll`
-          //http://localhost:8083/api/v1/leave/getAll
-          , {
-          withCredentials: true,
-        });
+        const response = await axios.get<Leave[]>(
+          `leaves/leave/getAll`,
+          { withCredentials: true }
+        );
 
-        // For normal users, it's already a list of leave entries
-        allLeaves = response.data.map(leave => ({
+        allLeaves = response.data.map((leave) => ({
           ...leave,
-          employeeName: user.name,
-          employeeEmail: user.email,
-          employeeRole: user.role
+          employeeName: user!.name,
+          employeeEmail: user!.email,
+          employeeRole: user!.role,
         }));
       }
 
-      // ✅ Sort so that 'pending' leaves come first
+      // Sort PENDING leaves first
       allLeaves.sort((a, b) => {
         if (a.status === "PENDING" && b.status !== "PENDING") return -1;
         if (a.status !== "PENDING" && b.status === "PENDING") return 1;
@@ -57,17 +72,15 @@ export const Leave = () => {
       });
 
       setLeaveList(allLeaves);
-      //console.log("Fetched leave list:", response);
-    } catch (err) {
-      if (axios.isAxiosError(err)) {
-        //console.error("Server fetch error:", err.response?.data);
-        toast.error("Failed to fetch leave data: " + (err.response?.data?.message || err.message));
-      } else {
-        toast.error("Unexpected error: " + err.message);
-      }
-    }
+    }catch (error: unknown) {
+  if (typeof error === 'object' && error !== null && 'message' in error) {
+    const message = (error as { message: string }).message;
+    toast.error(message);
+  } else {
+    toast.error('An unknown error occurred');
+  }
+}
   };
-
 
   useEffect(() => {
     fetchLeaveList();
@@ -95,13 +108,13 @@ export const Leave = () => {
         {leaveList.length > 0 ? (
           leaveList.map((leave) => (
             <LeaveComponent
-              key={leave.leaveId} // ✅ FIXED
+              key={leave.leaveId}
               leave={leave}
-              employeeName={leave.employeeName} // ✅ FIXED
-              employeeEmail={leave.employeeEmail} // ✅ FIXED
-              employeeRole={leave.employeeRole} // ✅ FIXED
+              employeeName={leave.employeeName}
+              employeeEmail={leave.employeeEmail}
+              employeeRole={leave.employeeRole}
               onUpdate={fetchLeaveList}
-              currUser={user} // ✅ FIXED
+              currUser={user!}
             />
           ))
         ) : (

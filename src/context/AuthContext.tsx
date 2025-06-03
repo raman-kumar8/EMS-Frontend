@@ -1,0 +1,76 @@
+// context/AuthContext.tsx
+import type { AuthContextType } from "@/interfaces/AuthContextType";
+
+import type User from "@/interfaces/User";
+
+import axios from "axios";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  type ReactNode,
+} from "react";
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
+
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+interface AuthProviderProps {
+  children: ReactNode;
+}
+
+export const AuthProvider = ({ children }: AuthProviderProps) => {
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+
+  const fetchDetails = async () => {
+    try {
+      const response = await axios.get<User>("/users/general/user", {
+        withCredentials: true,
+      });
+      setUser(response.data);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (error:unknown) {
+      setUser(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchDetails();
+  }, []);
+
+  const logout = () => {
+    const helper = async () => {
+      try {
+        await axios.get("/users/users/logout", { withCredentials: true });
+        toast.success("Logout successfully");
+        setUser(null);
+        localStorage.removeItem("jwt_token");
+        navigate("/login");
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    helper();
+  };
+
+  return (
+    <AuthContext.Provider
+      value={{ user, setUser, loading, logout, fetchDetails }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
+};
+
+export const useAuth = (): AuthContextType => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return context;
+};

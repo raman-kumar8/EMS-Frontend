@@ -10,29 +10,42 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import axios from "axios";
+
 import toast from "react-hot-toast";
 
-const AddLeaveModal = ({ open, onClose, onAddSuccess }) => {
-  const initialFormState = {
+
+
+interface AddLeaveModalProps {
+  open: boolean;
+  onClose: () => void;
+  onAddSuccess?: () => void;
+}
+
+interface LeaveForm {
+  reason: string;
+  startDate: string;
+  endDate: string;
+}
+
+
+const AddLeaveModal: React.FC<AddLeaveModalProps> = ({ open, onClose, onAddSuccess }) => {
+  const initialFormState: LeaveForm = {
     reason: "",
     startDate: "",
     endDate: "",
   };
 
-  const [form, setForm] = useState(initialFormState);
+  const [form, setForm] = useState<LeaveForm>(initialFormState);
 
-  const handleChange = (key, value) => {
+  const handleChange = (key: keyof LeaveForm, value: string) => {
     setForm((prev) => ({ ...prev, [key]: value }));
   };
 
   const handleSubmit = async () => {
     try {
-
       await axios.post(
-        `leaves/leave/apply`
-        //http://localhost:8083/api/v1/leave/apply
-        ,
-        { ...form},
+        "leaves/leave/apply",
+        { ...form },
         { withCredentials: true }
       );
 
@@ -40,15 +53,14 @@ const AddLeaveModal = ({ open, onClose, onAddSuccess }) => {
       setForm(initialFormState);
       onAddSuccess?.();
       onClose();
-    } catch (err) {
-      if (axios.isAxiosError(err)) {
-        console.error("Server validation error:", err.response?.data);
-        toast.error("Failed to apply for leave: " + (err.response?.data?.message || err.message));
-      } else {
-        toast.error("Unexpected error: " + err.message);
-      }
-    }
-
+    } catch (error: unknown) {
+  if (typeof error === 'object' && error !== null && 'message' in error) {
+    const message = (error as { message: string }).message;
+    toast.error(message);
+  } else {
+    toast.error('An unknown error occurred');
+  }
+}
   };
 
   return (

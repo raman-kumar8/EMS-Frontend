@@ -20,37 +20,74 @@ import dayjs from "dayjs";
 import axios from "axios";
 import toast from "react-hot-toast";
 
-const AddTaskModal = ({ open, onClose, onTaskAdded,update }) => {
-  const initialFormState = {
-  taskName: "",
-  description: "",
-  title: "",
-  taskStatus: "PENDING",
-  priority: "MEDIUM",
-  taskTag: "",
-  startTime: dayjs().format("HH:mm:ss"),
-};
+interface AddTaskModalProps {
+  open: boolean;
+  onClose: () => void;
+  onTaskAdded?: () => void;
+  update: () => void;
+}
 
-  const [form, setForm] = useState(initialFormState);
+type TaskPriority = "LOW" | "MEDIUM" | "HIGH";
+type TaskStatus = "PENDING" | "IN_PROGRESS" | "COMPLETED";
 
-  const handleChange = (key, value) => {
+interface TaskFormState {
+  taskName: string;
+  description: string;
+  title: string;
+  taskStatus: TaskStatus;
+  priority: TaskPriority;
+  taskTag: string;
+  startTime: string;
+}
+
+const AddTaskModal: React.FC<AddTaskModalProps> = ({
+  open,
+  onClose,
+  onTaskAdded,
+  update,
+}) => {
+  const initialFormState: TaskFormState = {
+    taskName: "",
+    description: "",
+    title: "",
+    taskStatus: "PENDING",
+    priority: "MEDIUM",
+    taskTag: "",
+    startTime: dayjs().format("HH:mm:ss"),
+  };
+
+  const [form, setForm] = useState<TaskFormState>(initialFormState);
+
+  const handleChange = (key: keyof TaskFormState, value: string) => {
     setForm((prev) => ({ ...prev, [key]: value }));
   };
 
   const handleSubmit = async () => {
     try {
-      const findUserId = await axios.get(`/users/general/validate`,{withCredentials:true});
+      const findUserId = await axios.get<string>(`/users/general/validate`, {
+        withCredentials: true,
+      });
       const userId = findUserId.data;
-      await axios.post(`tasks/add`, { ...form, userId,startTime:dayjs().format("HH:mm:ss") },{withCredentials:true});
+
+      await axios.post(
+        `tasks/add`,
+        { ...form, userId, startTime: dayjs().format("HH:mm:ss") },
+        { withCredentials: true }
+      );
+
       onTaskAdded?.();
       onClose();
       update();
-      toast.success("Task Added Succesfully")
+      toast.success("Task Added Successfully");
       setForm(initialFormState);
-      
-    } catch (err) {
-      toast.error("Failed to Add Task`"+`${err.message}`)
-    }
+    } catch (error: unknown) {
+  if (typeof error === 'object' && error !== null && 'message' in error) {
+    const message = (error as { message: string }).message;
+    toast.error(message);
+  } else {
+    toast.error('An unknown error occurred');
+  }
+}
   };
 
   return (
@@ -103,7 +140,9 @@ const AddTaskModal = ({ open, onClose, onTaskAdded,update }) => {
             <label className="text-sm font-medium text-blue-900">Priority</label>
             <Select
               value={form.priority}
-              onValueChange={(value) => handleChange("priority", value)}
+              onValueChange={(value: TaskPriority) =>
+                handleChange("priority", value)
+              }
             >
               <SelectTrigger className="bg-white border border-blue-200 focus:ring-2 focus:ring-blue-500">
                 <SelectValue placeholder="Select Priority" />
@@ -120,7 +159,9 @@ const AddTaskModal = ({ open, onClose, onTaskAdded,update }) => {
             <label className="text-sm font-medium text-blue-900">Status</label>
             <Select
               value={form.taskStatus}
-              onValueChange={(value) => handleChange("taskStatus", value)}
+              onValueChange={(value: TaskStatus) =>
+                handleChange("taskStatus", value)
+              }
             >
               <SelectTrigger className="bg-white border border-blue-200 focus:ring-2 focus:ring-blue-500">
                 <SelectValue placeholder="Select Status" />

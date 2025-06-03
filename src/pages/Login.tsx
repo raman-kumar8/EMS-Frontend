@@ -1,9 +1,9 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useForm, type SubmitHandler } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import axios from "axios";
-import { useAuth } from "../context/AuthContext.jsx";
+import { useAuth } from "../context/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
 import {
   Form,
@@ -15,33 +15,42 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useEffect, useState } from "react";
-import { Eye, EyeOff, Mail, LogIn } from "lucide-react"; 
+import { Eye, EyeOff, Mail, LogIn } from "lucide-react";
 import toast from "react-hot-toast";
+import type { AuthContextType } from "@/interfaces/AuthContextType";
+import type User from "@/interfaces/User";
 
+
+// Zod schema
 const formSchema = z.object({
   email: z
     .string()
     .min(1, { message: "Email is required." })
     .email({ message: "Not a valid email." }),
-  password: z.string().min(8, { message: "Password must be at least 8 characters." }),
+  password: z
+    .string()
+    .min(8, { message: "Password must be at least 8 characters." }),
   role: z.enum(["user", "admin"], {
     errorMap: () => ({ message: "Please select a role." }),
   }),
 });
 
+// Inferred TypeScript type from Zod schema
+type LoginFormData = z.infer<typeof formSchema>;
+
 const Login = () => {
   const navigate = useNavigate();
-  const { user, setUser, loading } = useAuth();
+  const { user, setUser, loading } = useAuth() as AuthContextType;
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+
   useEffect(() => {
     if (!loading && user) {
-      navigate("/"); // Already logged in, go to home
+      navigate("/");
     }
   }, [user, loading, navigate]);
-  
-  const form = useForm({
+
+  const form = useForm<LoginFormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: "",
@@ -50,36 +59,35 @@ const Login = () => {
     },
   });
 
-  const onSubmit = async (data) => {
+  const onSubmit: SubmitHandler<LoginFormData> = async (data) => {
     try {
       setIsSubmitting(true);
       const payload = {
         email: data.email,
         password: data.password,
       };
-      
 
       // Login (sets cookie)
-    const r1 =   await axios.post(`/users/users/login`, payload, {
+      await axios.post(`/users/users/login`, payload, {
         withCredentials: true,
       });
-    
-       
-      // Immediately fetch user info
-      const userRes = await axios.get(`/users/general/user`, {
-        withCredentials: true,
-      });
-    
 
-      // Update context
+      // Immediately fetch user info
+      const userRes = await axios.get<User>(`/users/general/user`, {
+        withCredentials: true,
+      });
+
       setUser(userRes.data);
       toast.success("Login successful!");
       navigate("/");
-    } catch (error) {
-
-     
-      toast.error(error?.response?.data?.message || "Login failed.");
-    } finally {
+    } catch (error: unknown) {
+  if (typeof error === 'object' && error !== null && 'message' in error) {
+    const message = (error as { message: string }).message;
+    toast.error(message);
+  } else {
+    toast.error('An unknown error occurred');
+  }
+} finally {
       setIsSubmitting(false);
     }
   };
@@ -88,11 +96,9 @@ const Login = () => {
     <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-blue-300 via-indigo-200 to-purple-300 px-4 py-8">
       <div className="w-full max-w-md">
         <div className="bg-white rounded-3xl shadow-xl overflow-hidden">
-          {/* Top accent bar */}
           <div className="h-2 bg-gradient-to-r from-blue-500 to-indigo-600"></div>
-          
+
           <div className="px-8 pt-8 pb-10">
-            {/* Logo and Header */}
             <div className="flex flex-col items-center mb-8">
               <div className="h-16 w-16 bg-indigo-100 rounded-full flex items-center justify-center mb-3">
                 <LogIn className="h-8 w-8 text-indigo-600" />
@@ -108,32 +114,35 @@ const Login = () => {
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-sm font-medium text-gray-700">Email Address</FormLabel>
+                      <FormLabel>Email Address</FormLabel>
                       <div className="relative">
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                           <Mail className="h-5 w-5 text-gray-400" />
                         </div>
                         <FormControl>
-                          <Input 
-                            placeholder="you@example.com" 
-                            className="pl-10 py-6 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                            {...field} 
+                          <Input
+                            placeholder="you@example.com"
+                            className="pl-10 py-6 rounded-xl"
+                            {...field}
                           />
                         </FormControl>
                       </div>
-                      <FormMessage className="text-xs" />
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
-                
+
                 <FormField
                   control={form.control}
                   name="password"
                   render={({ field }) => (
                     <FormItem>
                       <div className="flex items-center justify-between">
-                        <FormLabel className="text-sm font-medium text-gray-700">Password</FormLabel>
-                        <a onClick={()=>navigate("/forget")} href="#" className="text-xs font-medium text-indigo-600 hover:text-indigo-500">
+                        <FormLabel>Password</FormLabel>
+                        <a
+                          onClick={() => navigate("/forget")}
+                          className="text-xs font-medium text-indigo-600 hover:text-indigo-500 cursor-pointer"
+                        >
                           Forgot password?
                         </a>
                       </div>
@@ -142,7 +151,7 @@ const Login = () => {
                           <Input
                             type={showPassword ? "text" : "password"}
                             placeholder="••••••••"
-                            className="py-6 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                            className="py-6 rounded-xl"
                             {...field}
                           />
                         </FormControl>
@@ -153,13 +162,13 @@ const Login = () => {
                           {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                         </div>
                       </div>
-                      <FormMessage className="text-xs" />
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
 
                 <Button
-                  className="w-full py-6 rounded-xl text-white font-medium shadow-md bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-300 hover:shadow-lg hover:opacity-95"
+                  className="w-full py-6 rounded-xl text-white font-medium bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700"
                   type="submit"
                   disabled={isSubmitting}
                 >
@@ -177,14 +186,11 @@ const Login = () => {
                 </Button>
               </form>
             </Form>
-            
-            {/* Sign Up Link */}
+
             <div className="mt-8 text-center">
-              <p className="text-sm text-gray-600">
-                Don't have an account?
-              </p>
-              <Link 
-                className="mt-2 inline-block font-medium text-indigo-600 hover:text-indigo-500" 
+              <p className="text-sm text-gray-600">Don't have an account?</p>
+              <Link
+                className="mt-2 inline-block font-medium text-indigo-600 hover:text-indigo-500"
                 to="/register"
               >
                 Create an account
@@ -192,8 +198,6 @@ const Login = () => {
             </div>
           </div>
         </div>
-        
-        {/* Additional info footer */}
         <p className="text-center text-xs text-gray-500 mt-4">
           subject to the Privacy Policy and Terms of Service
         </p>

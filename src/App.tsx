@@ -5,7 +5,7 @@ import Login from "./pages/Login"
 import Home from "./pages/Home"
 import ProtectedRoute from "./components/ProtectedRoute"
 import PublicRoute from "./components/PublicRoute"
-import { Task } from "./pages/Task"
+import TaskPage from "./pages/TaskPage"
 import NotFound from "./pages/NotFound"
 import ReportPage from "./pages/ReportPage"
 import AboutUs from "./pages/AboutUs"
@@ -26,7 +26,7 @@ const App = () => {
 
       <Route path="/task" element = {
         <ProtectedRoute>
-            <Task/>
+            <TaskPage/>
         </ProtectedRoute>
       }/>
       <Route path="/report" element = {

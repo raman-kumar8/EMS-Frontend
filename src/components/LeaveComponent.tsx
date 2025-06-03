@@ -11,15 +11,10 @@ import dayjs from "dayjs";
 import React from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
+import type Leave from "@/interfaces/Leave";
+import type User from "@/interfaces/User";
 
-// TypeScript interface for the leave object
-interface Leave {
-  leaveId: string;
-  reason: string;
-  status: string;
-  startDate: string;
-  endDate: string;
-}
+
 
 interface LeaveComponentProps {
   leave: Leave;
@@ -27,56 +22,61 @@ interface LeaveComponentProps {
   employeeName: string;
   employeeEmail: string;
   employeeRole?: string;
-  currUser?: any;
+  currUser: User;
 }
 
-// Convert "john doe" => "John Doe"
-const toTitleCase = (str: string) =>
+const toTitleCase = (str: string): string =>
   str
     .toLowerCase()
     .split(" ")
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");
 
-// Convert "admin" => "Admin"
-const toFirstCapital = (str: string) =>
+const toFirstCapital = (str: string): string =>
   str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 
 const LeaveComponent: React.FC<LeaveComponentProps> = ({
-                                                         leave,
-                                                         onUpdate,
-                                                         employeeName,
-                                                         employeeEmail,
-                                                         employeeRole,currUser,
-                                                       }) => {
+  leave,
+  onUpdate,
+  employeeName,
+  employeeEmail,
+  employeeRole,
+  currUser,
+}) => {
+  type StatusKey = keyof typeof statusConfig;
+
   const statusConfig = {
     PENDING: { color: "text-amber-600", bg: "bg-amber-50", icon: Pause },
     APPROVED: { color: "text-green-600", bg: "bg-green-50", icon: CheckCircle },
     REJECTED: { color: "text-red-600", bg: "bg-red-50", icon: FileText },
     PROCESSING: { color: "text-blue-600", bg: "bg-blue-50", icon: Loader },
-  };
+  } as const;
 
-  const statusKey = leave.status?.toUpperCase();
+  // Normalize status key as uppercase string
+  const statusKey = (leave.status?.toUpperCase() ?? "PENDING") as StatusKey;
+
   const status = statusConfig[statusKey] || statusConfig.PENDING;
   const StatusIcon = status.icon;
 
-  const handleAction = async (action: "approve" | "reject") => {
+  const handleAction = async (action: "approve" | "reject"): Promise<void> => {
     try {
       await axios.put(
-        `leaves/admin/leave/approve?id=${leave.leaveId}`
-        //http://localhost:8083/api/v1/admin/leave/approve?id=${leave.leaveId}
-        ,
+        `leaves/admin/leave/approve?id=${leave.leaveId}`,
         {},
         { withCredentials: true }
       );
       toast.success(`Leave ${action === "approve" ? "approved" : "rejected"} successfully`);
-      onUpdate(); // Refresh the leave list
-    } catch (error) {
-      console.error(error);
-      toast.error("Failed to update leave status");
-    }
+      onUpdate();
+    }catch (error: unknown) {
+  if (typeof error === 'object' && error !== null && 'message' in error) {
+    const message = (error as { message: string }).message;
+    toast.error(message);
+  } else {
+    toast.error('An unknown error occurred');
+  }
+}
   };
-console.log(currUser);
+
   return (
     <div className="w-full max-w-2xl mx-auto mb-6">
       <div className="bg-white rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 overflow-hidden">
@@ -85,9 +85,7 @@ console.log(currUser);
         <div className="p-6">
           {/* Header with employee info */}
           <div className="mb-4">
-            <h2 className="text-2xl font-bold text-gray-800 mb-1">
-              {toTitleCase(employeeName)}
-            </h2>
+            <h2 className="text-2xl font-bold text-gray-800 mb-1">{toTitleCase(employeeName)}</h2>
             <div className="flex flex-col sm:flex-row sm:items-center sm:gap-4 text-sm text-gray-600 bg-gray-50 p-3 rounded-lg">
               <div className="flex items-center gap-2">
                 <Mail size={16} className="text-blue-500" />
@@ -145,7 +143,7 @@ console.log(currUser);
           </div>
 
           {/* Action Buttons */}
-          {leave.status === "PENDING" && currUser.role==="admin" && (
+          {leave.status === "PENDING" && currUser.role === "admin" && (
             <div className="flex gap-4 mt-4">
               <button
                 className="bg-green-600 hover:bg-green-700 text-white text-sm px-4 py-2 rounded-lg shadow"

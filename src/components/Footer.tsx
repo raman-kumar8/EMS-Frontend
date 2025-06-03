@@ -3,10 +3,7 @@ import { useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import {
-  Facebook,
-  Twitter,
-  Instagram,
-  Linkedin,
+ 
   Mail,
   Phone,
   MapPin,
@@ -14,10 +11,11 @@ import {
   CheckCircle
 } from "lucide-react";
 
+
 const Footer = () => {
   const [email, setEmail] = useState("");
 
-  const handleSubscribe = async (e) => {
+  const handleSubscribe = async (e:React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
       await axios.post("leaves/newsletter/subscribe"
@@ -25,14 +23,14 @@ const Footer = () => {
         , { email });
       toast.success("Thanks for subscribing!");
       setEmail("");
-    } catch (err) {
-      if (axios.isAxiosError(err)) {
-        console.error("Server fetch error:", err.response?.data);
-        toast.error("Failed to fetch leave data: " + (err.response?.data?.message || err.message));
-      } else {
-        toast.error("Unexpected error: " + err.message);
-      }
-    }
+    }catch (error: unknown) {
+  if (typeof error === 'object' && error !== null && 'message' in error) {
+    const message = (error as { message: string }).message;
+    toast.error(message);
+  } else {
+    toast.error('An unknown error occurred');
+  }
+}
   };
 
   return (
@@ -64,25 +62,7 @@ const Footer = () => {
             <p className="text-blue-800 text-sm leading-relaxed mb-6">
               Simplify your workflow, boost productivity, and achieve more with our intuitive task management solution.
             </p>
-            <div className="flex space-x-4 mt-2">
-              {[
-                { href: "https://facebook.com", icon: Facebook, label: "Facebook" },
-                { href: "https://twitter.com", icon: Twitter, label: "Twitter" },
-                { href: "https://instagram.com", icon: Instagram, label: "Instagram" },
-                { href: "https://linkedin.com", icon: Linkedin, label: "LinkedIn" },
-              ].map(({ href, icon: Icon, label }) => (
-                <a
-                  key={label}
-                  href={href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={label}
-                  className="w-10 h-10 rounded-full bg-blue-200 hover:bg-blue-300 flex items-center justify-center text-blue-700 transition-all duration-300"
-                >
-                  <Icon size={18} />
-                </a>
-              ))}
-            </div>
+            
           </div>
 
           {/* Quick Links */}

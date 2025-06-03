@@ -3,29 +3,16 @@ import GenerateReportModal from '../components/GenerateReportModal';
 import ReportCard from '@/components/ReportCard';
 import Pusher from 'pusher-js';
 import {
-  FileText, Download, Calendar, Clock, User, Filter, Search, Plus, Trash2,
-  Eye, AlertCircle, CheckCircle, Loader, RefreshCw, BarChart3, TrendingUp, FileBarChart
+  FileText , Filter, Search, Plus,
+   AlertCircle, CheckCircle, Loader,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import axios from 'axios';
-import type { AxiosError } from 'axios';
 
-// Updated interface to match backend response
-interface Report {
-  reportId: string;
-  userId: string;
-  reportName: string;
-  generatedTime?: string;
-  summary?: string;
-  s3Url?: string;
-  status: 'COMPLETED' | 'PROCESSING' | 'FAILED' | 'PENDING';
-  created_at: string;
-  updated_at?: string;
-  reportTask?: {
-    id: string;
-    includedTaskNames: string[];
-  };
-}
+import type Report from '@/interfaces/Report';
+import type { GenerateReportRequest } from '@/components/GenerateReportModal';
+
+
 
 const ReportPage: React.FC = () => {
   const [userId, setUserId] = useState<string>('');
@@ -42,31 +29,41 @@ const ReportPage: React.FC = () => {
 
 const fetchUserIdAndReports = async () => {
   try {
-    const { data: fetchedUserId } = await axios.get('/users/general/validate', { withCredentials: true });
+    const { data: fetchedUserId } = await axios.get<string>('/users/general/validate', { withCredentials: true });
     setUserId(fetchedUserId);
 
     const res = await axios.get(`/reports/report/user/${fetchedUserId}`, { withCredentials: true });
-    const reportsData = res.data || [];
+    const reportsData = res.data as Report[];
+    
    
     setReports(reportsData);
     
-  } catch (error: any) {
-    
-    toast.error(error?.message || 'Failed to fetch reports');
-    setReports([]); // ⛑️ Important fallback
-  } finally {
+  } catch (error: unknown) {
+  if (typeof error === 'object' && error !== null && 'message' in error) {
+    const message = (error as { message: string }).message;
+    toast.error(message);
+  } else {
+    toast.error('An unknown error occurred');
+  }
+  setReports([]);
+} finally {
     setLoading(false);
   }
 };
 const fetchReport = async ()=>{
   try {
     const res = await axios.get(`/reports/report/user/${userId}`, { withCredentials: true });
-    const reportsData = res.data || [];
+    const reportsData = res.data as Report[];
    
     setReports(reportsData);
-  } catch (error) {
-    toast.error(error.message);
+  } catch (error: unknown) {
+  if (typeof error === 'object' && error !== null && 'message' in error) {
+    const message = (error as { message: string }).message;
+    toast.error(message);
+  } else {
+    toast.error('An unknown error occurred');
   }
+}
 }
   useEffect(() => {
    
@@ -89,9 +86,10 @@ useEffect(() => {
   });
 
   const channel = pusher.subscribe(`user-${userId}`);
-  channel.bind('report-status-update', (data: any) => {
-    console.log('Report status update received:', data);
+  channel.bind('report-status-update', () => {
+   
     fetchReport();
+    
   });
 
   pusherRef.current = pusher;
@@ -102,32 +100,41 @@ useEffect(() => {
     pusher.disconnect();
   };
 }, [userId]);
- const handleDelete = async(reportId)=>{
+ const handleDelete = async(reportId:string)=>{
   try {
         
-    const r = await axios.delete(`/reports/report/${reportId}`,{withCredentials:true});
+    await axios.delete(`/reports/report/${reportId}`,{withCredentials:true});
     
     fetchUserIdAndReports();
 
-  } catch (error:AxiosError) {
-    toast.error(error.message)
+  }catch (error: unknown) {
+  if (typeof error === 'object' && error !== null && 'message' in error) {
+    const message = (error as { message: string }).message;
+    toast.error(message);
+  } else {
+    toast.error('An unknown error occurred');
   }
+}
  }
-  const handleGenerateReport = async (reportData: any) => {
-    setGeneratingReport(true);
-    try {
-      const response = await axios.post('/reports/report/generate', reportData, { withCredentials: true });
-      toast.success('Report generation triggered');
+const handleGenerateReport = async (request: GenerateReportRequest) => {
+  setGeneratingReport(true);
+  try {
+    await axios.post('/reports/report/generate', request, { withCredentials: true });
+    toast.success('Report generation triggered');
+    fetchUserIdAndReports();
+  } catch (error: unknown) {
+  if (typeof error === 'object' && error !== null && 'message' in error) {
+    const message = (error as { message: string }).message;
+    toast.error(message);
+  } else {
+    toast.error('An unknown error occurred');
+  }
+} finally {
+    setGeneratingReport(false);
+  }
+};
 
-    
-      fetchUserIdAndReports();
-    } catch (error: any) {
-      const message = error.response?.data?.message || error.message || 'Failed to generate report';
-      toast.error(message);
-    } finally {
-      setGeneratingReport(false);
-    }
-  };
+
 
   const filteredReports = reports.filter(report => {
     const matchesSearch = report.reportName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -244,13 +251,17 @@ useEffect(() => {
       </div>
 
       {/* Generate Report Modal */}
-      <GenerateReportModal
-        isOpen={showGenerateModal}
-        onClose={() => setShowGenerateModal(false)}
-        onGenerate={handleGenerateReport}
-        isGenerating={generatingReport}
-        userId={userId}
-      />
+{userId && (
+  <GenerateReportModal
+    isOpen={showGenerateModal}
+    onClose={() => setShowGenerateModal(false)}
+    onGenerate={handleGenerateReport}
+    isGenerating={generatingReport}
+    userId={userId}
+  />
+)}
+
+
     </div>
   );
 };

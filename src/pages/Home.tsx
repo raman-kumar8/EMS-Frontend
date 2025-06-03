@@ -1,45 +1,56 @@
-import { useAuth } from "../context/AuthContext.jsx";
+import { useAuth } from "../context/AuthContext.js";
 import { Button } from "@/components/ui/button.tsx";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card.tsx";
-import { Calendar, Clock, User, Briefcase, LogOut, Mail, Phone, MapPin, TrendingUp, CheckCircle, BarChart3 } from "lucide-react";
+import { Calendar, User, Briefcase, Mail, TrendingUp, CheckCircle, BarChart3 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import type { AxiosError } from "axios";
+
 import axios from "axios";
 import UpdateUserModal from "@/components/UpdateUserModal.tsx";
+import type Task from "@/interfaces/Task.tsx";
+
 
 const Home = () => {
-    const { user, logout , fetchDetails } = useAuth();
-    const [userId, setUserId] = useState("");
+    const { user , fetchDetails } = useAuth();
+    const [, setUserId] = useState<string>("");
     const navigate = useNavigate();
-    const [taskList, setTaskList] = useState([]);
-    const [report, setReportList] = useState([]);
-    const [leaves, setLeavesList] = useState([]);
+    const [taskList, setTaskList] = useState<Task[]>([]);
+    const [report, setReportList] = useState<Report[]>([]);
+   
     const [showModal, setShowModal] = useState(false);
 
     const fetchTaskList = async () => {
         try {
-            const response = await axios.get("/tasks/getAll", { withCredentials: true });
+            const response = await axios.get<Task[]>("/tasks/getAll", { withCredentials: true });
             setTaskList(response.data);
-        } catch (error: AxiosError) {
-            toast.error(error.message);
-        }
+        } catch (error: unknown) {
+  if (typeof error === 'object' && error !== null && 'message' in error) {
+    const message = (error as { message: string }).message;
+    toast.error(message);
+  } else {
+    toast.error('An unknown error occurred');
+  }
+}
     }
 
     const fetchUserIdAndReports = async () => {
         try {
-            const { data: fetchedUserId } = await axios.get('/users/general/validate', { withCredentials: true });
+            const { data: fetchedUserId } = await axios.get<string>('/users/general/validate', { withCredentials: true });
             setUserId(fetchedUserId);
 
             const res = await axios.get(`/reports/report/user/${fetchedUserId}`, { withCredentials: true });
-            const reportsData = res.data || [];
+            const reportsData = res.data as Report[];
 
-            setReportList(res.data);
-        } catch (error: any) {
-            toast.error(error?.message || 'Failed to fetch reports');
-            setReportList([]);
-        }
+            setReportList(reportsData);
+        }catch (error: unknown) {
+  if (typeof error === 'object' && error !== null && 'message' in error) {
+    const message = (error as { message: string }).message;
+    toast.error(message);
+  } else {
+    toast.error('An unknown error occurred');
+  }
+}
     };
 
     useEffect(() => {
@@ -47,13 +58,6 @@ const Home = () => {
         fetchUserIdAndReports();
     }, [])
 
-    const handleLogout = async () => {
-        try {
-            await logout();
-        } catch (error) {
-            console.error('Logout failed:', error);
-        }
-    };
 
     const navigateTo = (path: string) => {
         navigate(path);
@@ -72,11 +76,7 @@ const Home = () => {
                         <div className="flex items-center gap-6">
                             <div className="relative">
                                 <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center shadow-lg">
-                                    {user?.avatar ? (
-                                        <img src={user.avatar} alt="Avatar" className="h-full w-full rounded-2xl object-cover" />
-                                    ) : (
-                                        <User className="h-8 w-8 text-white" />
-                                    )}
+                                  <User className="h-8 w-8 text-white" />
                                 </div>
                                 <div className="absolute -bottom-1 -right-1 h-4 w-4 bg-green-500 rounded-full border-2 border-white"></div>
                             </div>
@@ -100,11 +100,7 @@ const Home = () => {
                             <CardHeader className="bg-gradient-to-br from-gray-50 to-gray-100 pb-6">
                                 <div className="flex flex-col items-center">
                                     <div className="h-20 w-20 rounded-2xl bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center shadow-lg">
-                                        {user?.avatar ? (
-                                            <img src={user.avatar} alt="Avatar" className="h-full w-full rounded-2xl object-cover" />
-                                        ) : (
-                                            <User className="h-10 w-10 text-white" />
-                                        )}
+                                       <User className="h-8 w-8 text-white" />
                                     </div>
                                     <h2 className="text-lg font-bold text-gray-900 mt-4">{user?.name || 'User Name'}</h2>
                                     <p className="text-blue-600 font-semibold text-sm">{user?.role || 'Department'}</p>
@@ -115,15 +111,8 @@ const Home = () => {
                                     <Mail className="h-4 w-4 text-gray-500" />
                                     <span className="text-sm font-medium truncate">{user?.email || 'user@example.com'}</span>
                                 </div>
-                                <div className="flex items-center gap-3 text-gray-700 p-3 rounded-lg bg-gray-50">
-                                    <Phone className="h-4 w-4 text-gray-500" />
-                                    <span className="text-sm font-medium">{user?.phone || '+1 (555) 000-0000'}</span>
-                                </div>
-                                <div className="flex items-start gap-3 text-gray-700 p-3 rounded-lg bg-gray-50">
-                                    <MapPin className="h-4 w-4 text-gray-500 mt-0.5 flex-shrink-0" />
-                                    <span className="text-sm font-medium">{user?.address || '123 Main St, City, Country'}</span>
-                                </div>
-
+                              
+                              
                                 {/* Edit Profile Button */}
                                 <div className="pt-4">
                                     <Button
@@ -174,7 +163,7 @@ const Home = () => {
                                     </div>
                                     <div>
                                         <p className="text-sm font-medium text-gray-600">Leave Balance</p>
-                                        <p className="text-2xl font-bold text-gray-900">{user.leaveCount}</p>
+                                        <p className="text-2xl font-bold text-gray-900">{user?.leaveCount}</p>
                                     </div>
                                 </div>
                             </div>
@@ -233,7 +222,7 @@ const Home = () => {
                                             <Calendar className="h-8 w-8 text-white" />
                                         </div>
                                         <div className="text-right">
-                                            <div className="text-3xl font-bold text-gray-900">{user.leaveCount}</div>
+                                            <div className="text-3xl font-bold text-gray-900">{user?.leaveCount}</div>
                                             <div className="text-sm text-gray-500">Days Left</div>
                                         </div>
                                     </div>
@@ -305,7 +294,10 @@ const Home = () => {
                                         <div className="text-gray-300 text-sm mt-1">Due this week</div>
                                     </div>
                                     <div className="text-center p-4 rounded-xl bg-white/10 backdrop-blur-sm">
-                                        <div className="text-3xl font-bold text-green-400 mb-2">{25 - user.leaveCount}</div>
+                                       <div className="text-3xl font-bold text-green-400 mb-2">
+                                             {25 - (user?.leaveCount ?? 0)}
+                                            </div>
+
                                         <div className="text-white font-semibold">Days Off Used</div>
                                         <div className="text-gray-300 text-sm mt-1">This month</div>
                                     </div>

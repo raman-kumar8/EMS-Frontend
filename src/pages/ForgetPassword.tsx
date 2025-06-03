@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useForm, type SubmitHandler } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
@@ -14,8 +14,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { Mail, Send } from "lucide-react";
 import toast from "react-hot-toast";
-import axios from "axios";
+
 import { useState } from "react";
+
 
 const formSchema = z.object({
   email: z
@@ -24,27 +25,31 @@ const formSchema = z.object({
     .email({ message: "Invalid email address." }),
 });
 
-const ForgetPassword = () => {
-  const [isSubmitting, setIsSubmitting] = useState(false);
+type ForgetPasswordFormValues = z.infer<typeof formSchema>;
 
-  const form = useForm({
+const ForgetPassword = () => {
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+
+  const form = useForm<ForgetPasswordFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: "",
     },
   });
 
-  const onSubmit = async (data) => {
+  const onSubmit: SubmitHandler<ForgetPasswordFormValues> = async (data) => {
     try {
       setIsSubmitting(true);
-      console.log(data);
-      await axios.post("users/users/forget",
-        //http://localhost:8080/api/v1/users/forget
-        data); // Update with your actual endpoint
+      await axios.post("/users/users/forget", data); 
       toast.success("Password reset link sent to your email.");
-    } catch (error) {
-      toast.error(error?.response?.data?.message || "Failed to send reset link.");
-    } finally {
+    } catch (error: unknown) {
+  if (typeof error === 'object' && error !== null && 'message' in error) {
+    const message = (error as { message: string }).message;
+    toast.error(message);
+  } else {
+    toast.error('An unknown error occurred');
+  }
+} finally {
       setIsSubmitting(false);
     }
   };
@@ -53,7 +58,6 @@ const ForgetPassword = () => {
     <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-blue-300 via-indigo-200 to-purple-300 px-4 py-8">
       <div className="w-full max-w-md">
         <div className="bg-white rounded-3xl shadow-xl overflow-hidden">
-          {/* Accent bar */}
           <div className="h-2 bg-gradient-to-r from-blue-500 to-indigo-600"></div>
 
           <div className="px-8 pt-8 pb-10">

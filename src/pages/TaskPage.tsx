@@ -3,28 +3,30 @@ import TaskComponent from "../components/TaskComponent";
 import AddTaskModal from "../components/AddTaskModal";
 import { Button } from "@/components/ui/button";
 import axios from "axios";
+
 import toast from "react-hot-toast";
+import type Task from "@/interfaces/Task";
 
-export const Task = () => {
-  const [showModal, setShowModal] = useState(false);
-  const [taskList, setTaskList] = useState([]);
+const TaskPage: React.FC = () => {
+  const [showModal, setShowModal] = useState<boolean>(false);
+  const [taskList, setTaskList] = useState<Task[]>([]);
 
- 
   const fetchList = async () => {
-
     try {
-      const response = await axios.get(`/tasks/getAll`, {
+      const response = await axios.get<Task[]>(`/tasks/getAll`, {
         withCredentials: true,
       });
-       
       setTaskList(response.data);
-    } catch (error) {
-     toast.error("Failed to Fetch the Task List");
-    }
+    }catch (error: unknown) {
+  if (typeof error === 'object' && error !== null && 'message' in error) {
+    const message = (error as { message: string }).message;
+    toast.error(message);
+  } else {
+    toast.error('An unknown error occurred');
+  }
+}
   };
 
-
-  // Load tasks once on component mount
   useEffect(() => {
     fetchList();
   }, []);
@@ -41,17 +43,22 @@ export const Task = () => {
         </Button>
       </div>
 
-      {/* Modal for Adding Task */}
-      <AddTaskModal open={showModal} update ={fetchList} onClose={() => setShowModal(false)} onAddSuccess={fetchList} />
+      {/* Add Task Modal */}
+      <AddTaskModal
+        open={showModal}
+        onClose={() => setShowModal(false)}
+        onTaskAdded={fetchList}
+        update={fetchList}
+      />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {taskList.length > 0 ? (
-          taskList?.map((task) => (
+          taskList.map((task) => (
             <TaskComponent
               key={task.id}
               task={task}
-              
-              onUpdate={fetchList} // Refresh list after update
+              onEdit={() => {}}
+              onUpdate={fetchList}
             />
           ))
         ) : (
@@ -61,3 +68,5 @@ export const Task = () => {
     </div>
   );
 };
+
+export default TaskPage;

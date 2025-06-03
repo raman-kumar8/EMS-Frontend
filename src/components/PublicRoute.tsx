@@ -1,7 +1,11 @@
-import { useAuth } from "../context/AuthContext.jsx";
+import type { ReactNode } from "react";
+import { useAuth } from "../context/AuthContext.js";
 import { Navigate } from "react-router-dom";
+interface PublicRouteProps {
+  children: ReactNode;
+}
 
-const PublicRoute = ({ children }) => {
+const PublicRoute:React.FC<PublicRouteProps> = ({ children }) => {
   const { user, loading } = useAuth();
 
   if (loading) {

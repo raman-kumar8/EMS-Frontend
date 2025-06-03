@@ -1,14 +1,38 @@
+import type Task from "@/interfaces/Task";
+
 import axios from "axios";
 import { Loader, Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { v4 as uuidv4 } from 'uuid';
 
-const GenerateReportModal = ({ isOpen, onClose, onGenerate, isGenerating, userId }) => {
-  const [tasks, setTasks] = useState([]);
-  const [selectedTasks, setSelectedTasks] = useState([]);
-  const [reportName, setReportName] = useState('');
-  const [error, setError] = useState('');
+
+export interface GenerateReportRequest {
+  taskIds: string[];
+  reportName: string;
+  userId: string;
+  creationDate: string;
+  reportId: string | null;
+}
+
+ interface GenerateReportModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onGenerate: (request: GenerateReportRequest) => void;
+  isGenerating: boolean;
+  userId: string;
+}
+
+const GenerateReportModal: React.FC<GenerateReportModalProps> = ({
+  isOpen,
+  onClose,
+  onGenerate,
+  isGenerating,
+  userId,
+}) => {
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [selectedTasks, setSelectedTasks] = useState<string[]>([]);
+  const [reportName, setReportName] = useState<string>("");
+  const [error, setError] = useState<string>("");
 
   useEffect(() => {
     if (isOpen) {
@@ -18,18 +42,21 @@ const GenerateReportModal = ({ isOpen, onClose, onGenerate, isGenerating, userId
 
   const fetchTasks = async () => {
     try {
-        const response = await axios.get(`/tasks/getAll`, {
+      const response = await axios.get<Task[]>(`/tasks/getAll`, {
         withCredentials: true,
-      }); // Replace with your actual endpoint
-      const data =  response.data;
-      setTasks(data);
-     
-    } catch (err) {
-     toast.error("Failed to Fetch Tasks");
-    }
+      });
+      setTasks(response.data);
+    }catch (error: unknown) {
+  if (typeof error === 'object' && error !== null && 'message' in error) {
+    const message = (error as { message: string }).message;
+    toast.error(message);
+  } else {
+    toast.error('An unknown error occurred');
+  }
+}
   };
 
-  const toggleTaskSelection = (taskId) => {
+  const toggleTaskSelection = (taskId: string) => {
     setSelectedTasks((prev) =>
       prev.includes(taskId) ? prev.filter((id) => id !== taskId) : [...prev, taskId]
     );
@@ -37,15 +64,15 @@ const GenerateReportModal = ({ isOpen, onClose, onGenerate, isGenerating, userId
 
   const handleSubmit = () => {
     if (!selectedTasks.length || !reportName.trim()) {
-      setError('Please select at least one task and enter a report name.');
+      setError("Please select at least one task and enter a report name.");
       return;
     }
 
-    const request = {
+    const request: GenerateReportRequest = {
       taskIds: selectedTasks,
       reportName: reportName.trim(),
       userId,
-     creationDate: new Date().toISOString(),
+      creationDate: new Date().toISOString(),
       reportId: null,
     };
     onGenerate(request);
@@ -62,7 +89,9 @@ const GenerateReportModal = ({ isOpen, onClose, onGenerate, isGenerating, userId
 
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Report Name</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Report Name
+              </label>
               <input
                 type="text"
                 value={reportName}
@@ -73,10 +102,15 @@ const GenerateReportModal = ({ isOpen, onClose, onGenerate, isGenerating, userId
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Select Tasks</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Select Tasks
+              </label>
               <div className="border border-gray-300 rounded-lg p-2 max-h-48 overflow-y-auto">
                 {tasks.map((task) => (
-                  <label key={task.id} className="flex items-center gap-2 px-2 py-1 hover:bg-gray-100 rounded">
+                  <label
+                    key={task.id}
+                    className="flex items-center gap-2 px-2 py-1 hover:bg-gray-100 rounded"
+                  >
                     <input
                       type="checkbox"
                       checked={selectedTasks.includes(task.id)}

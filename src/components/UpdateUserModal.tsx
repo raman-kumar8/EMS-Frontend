@@ -11,24 +11,38 @@ import { Button } from "@/components/ui/button";
 import axios from "axios";
 import toast from "react-hot-toast";
 
-const UpdateUserModal = ({ open, onClose, onUpdateSuccess }) => {
-  const initialFormState = {
+
+interface UpdateUserModalProps {
+  open: boolean;
+  onClose: () => void;
+  onUpdateSuccess?: () => void;
+}
+
+interface UserForm {
+  name: string;
+  email: string;
+}
+
+const UpdateUserModal: React.FC<UpdateUserModalProps> = ({
+  open,
+  onClose,
+  onUpdateSuccess,
+}) => {
+  const initialFormState: UserForm = {
     name: "",
     email: "",
   };
 
-  const [form, setForm] = useState(initialFormState);
+  const [form, setForm] = useState<UserForm>(initialFormState);
 
-  const handleChange = (key, value) => {
+  const handleChange = (key: keyof UserForm, value: string) => {
     setForm((prev) => ({ ...prev, [key]: value }));
   };
 
   const handleSubmit = async () => {
     try {
-     // console.log({...form});
       await axios.put(
         `users/users/update`,
-        //http://localhost:8080/api/v1/users/update
         { ...form },
         { withCredentials: true }
       );
@@ -37,28 +51,14 @@ const UpdateUserModal = ({ open, onClose, onUpdateSuccess }) => {
       setForm(initialFormState);
       onUpdateSuccess?.();
       onClose();
-    } catch (err) {
-      if (axios.isAxiosError(err)) {
-        const responseData = err.response?.data;
-
-        // Log the entire response object for full debugging info
-        console.error("Server Error Response:", responseData);
-
-        // Try to extract multiple possible fields
-        const errorMessage =
-          responseData?.message ||
-          responseData?.error ||
-          responseData?.errors?.join(", ") || // for validation errors in array
-          JSON.stringify(responseData) ||     // fallback to raw JSON
-          err.message;
-
-        toast.error("Failed to update user: " + errorMessage);
-      } else {
-        console.error("Unexpected Error:", err);
-        toast.error("Unexpected error: " + err.message);
-      }
-    }
-
+    } catch (error: unknown) {
+  if (typeof error === 'object' && error !== null && 'message' in error) {
+    const message = (error as { message: string }).message;
+    toast.error(message);
+  } else {
+    toast.error('An unknown error occurred');
+  }
+}
   };
 
   return (

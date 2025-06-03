@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import axios from "axios";
+
 import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   Form,
@@ -17,7 +17,10 @@ import { useState } from "react";
 import { Eye, EyeOff, KeyRound } from "lucide-react";
 import toast from "react-hot-toast";
 
-// Zod Schema
+
+import type ResetPasswordFormValues from "@/interfaces/ResetPasswordFormValues";
+
+
 const resetPasswordSchema = z
   .object({
     newPassword: z.string().min(8, "Password must be at least 8 characters."),
@@ -41,20 +44,25 @@ const ResetPassword = () => {
     },
   });
 
-  const onSubmit = async (values) => {
+  const onSubmit = async (values:ResetPasswordFormValues) => {
     try {
-      let response =  axios.post("users/users/reset-password"
-        //http://localhost:8080/api/v1/users/reset-password
+       axios.post("users/users/reset-password"
+        
         , {
         token,
         newPassword: values.newPassword,
       });
-      console.log(response);
+      
       toast.success("Reset Password Successfully and redirecting to login page");
       navigate("/login");
-    } catch (err) {
-      toast.error(err?.response?.data?.message || "Reset failed");
-    }
+    } catch (error: unknown) {
+  if (typeof error === 'object' && error !== null && 'message' in error) {
+    const message = (error as { message: string }).message;
+    toast.error(message);
+  } else {
+    toast.error('An unknown error occurred');
+  }
+}
   };
 
   return (

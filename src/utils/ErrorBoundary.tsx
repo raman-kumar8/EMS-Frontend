@@ -1,4 +1,4 @@
-import { Component, ErrorInfo, ReactNode } from "react";
+import { Component, type ErrorInfo, type ReactNode } from "react";
 import toast from "react-hot-toast";
 
 type Props = {
@@ -12,6 +12,7 @@ type State = {
 class ErrorBoundary extends Component<Props, State> {
   state: State = { hasError: false };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   static getDerivedStateFromError(_: Error) {
     // Don't update state to avoid UI fallback
     return null;

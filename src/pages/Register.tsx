@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { useAuth } from "../context/AuthContext.jsx";
+import { useAuth } from "../context/AuthContext"; // Adjust as needed
 import {
   Form,
   FormControl,
@@ -14,11 +14,19 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Eye, EyeOff, Mail, User, UserPlus, Lock } from "lucide-react"; 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Eye, EyeOff, Mail, User, UserPlus, Lock } from "lucide-react";
 import toast from "react-hot-toast";
+import { Input } from "@/components/ui/input.js";
+import type { AuthContextType } from "@/interfaces/AuthContextType";
 
+// 1. Define form schema and type
 const formSchema = z
   .object({
     username: z.string().min(3, {
@@ -26,12 +34,8 @@ const formSchema = z
     }),
     email: z
       .string()
-      .min(1, {
-        message: "Email is required.",
-      })
-      .email({
-        message: "Not a valid email.",
-      }),
+      .min(1, { message: "Email is required." })
+      .email({ message: "Not a valid email." }),
     password: z.string().min(8, {
       message: "Password must be at least 8 characters.",
     }),
@@ -47,20 +51,26 @@ const formSchema = z
     path: ["confirmPassword"],
   });
 
+type RegisterFormValues = z.infer<typeof formSchema>;
+
+
+
+
+// 3. Register component
 const Register = () => {
   const navigate = useNavigate();
-  const { user, loading } = useAuth();
+  const { user, loading } = useAuth() as AuthContextType;
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+
   useEffect(() => {
     if (!loading && user) {
-      navigate("/"); // Already logged in, go to home
+      navigate("/");
     }
   }, [user, loading, navigate]);
-  
-  const form = useForm({
+
+  const form = useForm<RegisterFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       username: "",
@@ -71,22 +81,27 @@ const Register = () => {
     },
   });
 
-  const onSubmit = async (data) => {
+  const onSubmit = async (data: RegisterFormValues) => {
     try {
       setIsSubmitting(true);
       const payload = {
         name: data.username,
         email: data.email,
         password: data.password,
-        role: data.role
+        role: data.role,
       };
-      
-      await axios.post(`/users/users/register`, payload);
+
+      await axios.post("/users/users/register", payload);
       toast.success("Registration successful!");
       navigate("/login");
-    } catch (error) {
-      toast.error(error?.response?.data?.message || "Registration failed.");
-    } finally {
+    } catch (error: unknown) {
+  if (typeof error === 'object' && error !== null && 'message' in error) {
+    const message = (error as { message: string }).message;
+    toast.error(message);
+  } else {
+    toast.error('An unknown error occurred');
+  }
+} finally {
       setIsSubmitting(false);
     }
   };
@@ -95,11 +110,8 @@ const Register = () => {
     <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-blue-300 via-indigo-200 to-purple-300 px-4 py-8">
       <div className="w-full max-w-md">
         <div className="bg-white rounded-3xl shadow-xl overflow-hidden">
-          {/* Top accent bar */}
           <div className="h-2 bg-gradient-to-r from-blue-500 to-indigo-600"></div>
-          
           <div className="px-8 pt-8 pb-10">
-            {/* Logo and Header */}
             <div className="flex flex-col items-center mb-8">
               <div className="h-16 w-16 bg-indigo-100 rounded-full flex items-center justify-center mb-3">
                 <UserPlus className="h-8 w-8 text-indigo-600" />
@@ -110,121 +122,123 @@ const Register = () => {
 
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                {/* Username Field */}
                 <FormField
                   control={form.control}
                   name="username"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-sm font-medium text-gray-700">Username</FormLabel>
+                      <FormLabel>Username</FormLabel>
                       <div className="relative">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                          <User className="h-5 w-5 text-gray-400" />
-                        </div>
+                        <User className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-5 w-5" />
                         <FormControl>
-                          <Input 
-                            placeholder="john_doe" 
-                            className="pl-10 py-5 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                            {...field} 
+                          <Input
+                            className="pl-10 py-5 rounded-xl"
+                            placeholder="john_doe"
+                            {...field}
                           />
                         </FormControl>
                       </div>
-                      <FormMessage className="text-xs" />
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
-                
+
+                {/* Email Field */}
                 <FormField
                   control={form.control}
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-sm font-medium text-gray-700">Email Address</FormLabel>
+                      <FormLabel>Email Address</FormLabel>
                       <div className="relative">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                          <Mail className="h-5 w-5 text-gray-400" />
-                        </div>
+                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-5 w-5" />
                         <FormControl>
-                          <Input 
-                            placeholder="you@example.com" 
-                            className="pl-10 py-5 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                            {...field} 
+                          <Input
+                            className="pl-10 py-5 rounded-xl"
+                            placeholder="you@example.com"
+                            {...field}
                           />
                         </FormControl>
                       </div>
-                      <FormMessage className="text-xs" />
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
-                
+
+                {/* Password Field */}
                 <FormField
                   control={form.control}
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-sm font-medium text-gray-700">Password</FormLabel>
+                      <FormLabel>Password</FormLabel>
                       <div className="relative">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                          <Lock className="h-5 w-5 text-gray-400" />
-                        </div>
+                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-5 w-5" />
                         <FormControl>
                           <Input
                             type={showPassword ? "text" : "password"}
+                            className="pl-10 py-5 rounded-xl"
                             placeholder="••••••••"
-                            className="pl-10 py-5 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                             {...field}
                           />
                         </FormControl>
                         <div
                           onClick={() => setShowPassword(!showPassword)}
-                          className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-400 hover:text-gray-600"
+                          className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-400"
                         >
-                          {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                          {showPassword ? <EyeOff /> : <Eye />}
                         </div>
                       </div>
-                      <FormMessage className="text-xs" />
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
-                
+
+                {/* Confirm Password Field */}
                 <FormField
                   control={form.control}
                   name="confirmPassword"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-sm font-medium text-gray-700">Confirm Password</FormLabel>
+                      <FormLabel>Confirm Password</FormLabel>
                       <div className="relative">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                          <Lock className="h-5 w-5 text-gray-400" />
-                        </div>
+                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-5 w-5" />
                         <FormControl>
                           <Input
                             type={showConfirmPassword ? "text" : "password"}
+                            className="pl-10 py-5 rounded-xl"
                             placeholder="••••••••"
-                            className="pl-10 py-5 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                             {...field}
                           />
                         </FormControl>
                         <div
-                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                          className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-400 hover:text-gray-600"
+                          onClick={() =>
+                            setShowConfirmPassword(!showConfirmPassword)
+                          }
+                          className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-400"
                         >
-                          {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                          {showConfirmPassword ? <EyeOff /> : <Eye />}
                         </div>
                       </div>
-                      <FormMessage className="text-xs" />
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
-                
+
+                {/* Role Field */}
                 <FormField
                   control={form.control}
                   name="role"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-sm font-medium text-gray-700">Select Role</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormLabel>Select Role</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
                         <FormControl>
-                          <SelectTrigger className="py-5 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                          <SelectTrigger className="py-5 rounded-xl">
                             <SelectValue placeholder="Select a role" />
                           </SelectTrigger>
                         </FormControl>
@@ -233,13 +247,14 @@ const Register = () => {
                           <SelectItem value="admin">Admin</SelectItem>
                         </SelectContent>
                       </Select>
-                      <FormMessage className="text-xs" />
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
-                
+
+                {/* Submit Button */}
                 <Button
-                  className="w-full py-6 mt-2 rounded-xl text-white font-medium shadow-md bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-300 hover:shadow-lg hover:opacity-95"
+                  className="w-full py-6 mt-2 rounded-xl text-white font-medium shadow-md bg-gradient-to-r from-blue-500 to-indigo-600"
                   type="submit"
                   disabled={isSubmitting}
                 >
@@ -257,14 +272,11 @@ const Register = () => {
                 </Button>
               </form>
             </Form>
-            
-            {/* Sign In Link */}
+
             <div className="mt-8 text-center">
-              <p className="text-sm text-gray-600">
-                Already have an account?
-              </p>
-              <Link 
-                className="mt-2 inline-block font-medium text-indigo-600 hover:text-indigo-500" 
+              <p className="text-sm text-gray-600">Already have an account?</p>
+              <Link
+                className="mt-2 inline-block font-medium text-indigo-600 hover:text-indigo-500"
                 to="/login"
               >
                 Sign in instead
@@ -272,8 +284,7 @@ const Register = () => {
             </div>
           </div>
         </div>
-        
-        {/* Additional info footer */}
+
         <p className="text-center text-xs text-gray-500 mt-4">
           By registering, you agree to our Terms of Service and Privacy Policy
         </p>

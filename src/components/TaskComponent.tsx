@@ -9,38 +9,77 @@ import {
   AlertCircle,
   MoreVertical,
   Edit3,
-  Trash2
+  Trash2,
 } from "lucide-react";
 import { useState } from "react";
 import axios from "axios";
 import dayjs from "dayjs";
 import durationPlugin from "dayjs/plugin/duration";
 import toast from "react-hot-toast";
-import type { AxiosError } from "axios";
+
+import type Task from "@/interfaces/Task";
 
 dayjs.extend(durationPlugin);
 
-const TaskComponent = ({ task, onUpdate,onEdit }) => {
+
+interface TaskComponentProps {
+  task: Task;
+  onUpdate?: () => void;
+  onEdit?: (data: {
+    id: string;
+    status: Task["taskStatus"];
+    priority: Task["priority"];
+    endTime: string;
+  }) => void;
+}
+
+const TaskComponent: React.FC<TaskComponentProps> = ({ task, onUpdate, onEdit }) => {
   const [updating, setUpdating] = useState(false);
   const [editMode, setEditMode] = useState(false);
-  const [localStatus, setLocalStatus] = useState(task.taskStatus);
-  const [localPriority, setLocalPriority] = useState(task.priority);
+  const [localStatus, setLocalStatus] = useState<Task["taskStatus"]>(task.taskStatus);
+  const [localPriority, setLocalPriority] = useState<Task["priority"]>(task.priority);
   const [showDropdown, setShowDropdown] = useState(false);
 
-  const statusOptions = ["PENDING", "IN_PROGRESS", "COMPLETED"];
-  const priorityOptions = ["LOW", "MEDIUM", "HIGH"];
+  const statusOptions: Task["taskStatus"][] = ["PENDING", "IN_PROGRESS", "COMPLETED"];
+  const priorityOptions: Task["priority"][] = ["LOW", "MEDIUM", "HIGH"];
 
-  const priorityConfig = {
-    HIGH: { color: "bg-red-50 text-red-700 border-red-200", dot: "bg-red-500", gradient: "from-red-50 to-red-100" },
-    MEDIUM: { color: "bg-amber-50 text-amber-700 border-amber-200", dot: "bg-amber-500", gradient: "from-amber-50 to-amber-100" },
-    LOW: { color: "bg-emerald-50 text-emerald-700 border-emerald-200", dot: "bg-emerald-500", gradient: "from-emerald-50 to-emerald-100" },
-  };
+const priorityConfig: Record<Task["priority"], {
+  color: string;
+  dot: string;
+  gradient: string;
+}> = {
+  HIGH: { color: "bg-red-50 text-red-700 border-red-200", dot: "bg-red-500", gradient: "from-red-50 to-red-100" },
+  MEDIUM: { color: "bg-amber-50 text-amber-700 border-amber-200", dot: "bg-amber-500", gradient: "from-amber-50 to-amber-100" },
+  LOW: { color: "bg-emerald-50 text-emerald-700 border-emerald-200", dot: "bg-emerald-500", gradient: "from-emerald-50 to-emerald-100" },
+};
 
-  const statusConfig = {
-    PENDING: { color: "text-amber-600", bg: "bg-amber-50", icon: Pause, gradient: "from-amber-400 to-orange-500" },
-    IN_PROGRESS: { color: "text-blue-600", bg: "bg-blue-50", icon: Loader, gradient: "from-blue-400 to-indigo-500" },
-    COMPLETED: { color: "text-emerald-600", bg: "bg-emerald-50", icon: CheckCircle, gradient: "from-emerald-400 to-green-500" },
-  };
+
+ const statusConfig: Record<Task["taskStatus"], {
+  color: string;
+  bg: string;
+  icon: React.ElementType;
+  gradient: string;
+}> = {
+  PENDING: {
+    color: "text-amber-600",
+    bg: "bg-amber-50",
+    icon: Pause,
+    gradient: "from-amber-400 to-orange-500",
+  },
+  IN_PROGRESS: {
+    color: "text-blue-600",
+    bg: "bg-blue-50",
+    icon: Loader,
+    gradient: "from-blue-400 to-indigo-500",
+  },
+  COMPLETED: {
+    color: "text-emerald-600",
+    bg: "bg-emerald-50",
+    icon: CheckCircle,
+    gradient: "from-emerald-400 to-green-500",
+  },
+};
+
 
   const duration = task.end_time
     ? dayjs.duration(dayjs(task.end_time, "HH:mm:ss").diff(dayjs(task.start_time, "HH:mm:ss")))
@@ -54,36 +93,44 @@ const TaskComponent = ({ task, onUpdate,onEdit }) => {
       ].join(":")
     : null;
 
-const handleUpdate = async (status, priority, id) => {
-  try {
-    setUpdating(true);
-    const body = { taskStatus: status, priority };
+  const handleUpdate = async (status: Task["taskStatus"], priority: Task["priority"], id: string) => {
+    try {
+      setUpdating(true);
+      const body: { taskStatus: Task["taskStatus"]; priority: Task["priority"]; endTime?: string } = {
+        taskStatus: status,
+        priority,
+      };
 
-    if (status === "COMPLETED") {
-      body.endTime = dayjs().format("HH:mm:ss");
+      if (status === "COMPLETED") {
+        body.endTime = dayjs().format("HH:mm:ss");
+      }
+
+      await axios.put(`/tasks/update/${id}`, body);
+      setEditMode(false);
+      onUpdate?.();
+      toast.success("Task Updated");
+    } catch (err) {
+      console.error("Failed to update task", err);
+      toast.error("Failed to update task");
+    } finally {
+      setUpdating(false);
     }
-        
-    await axios.put(`/tasks/update/${id}`, body);
-    setEditMode(false);
-    onUpdate?.();
-    toast.success("Task Updated")
-   
-  } catch (err) {
-    console.error("Failed to update task", err);
-  } finally {
-    setUpdating(false);
+  };
+
+  const handleDelete = async (id: string) => {
+    try {
+      await axios.delete(`/tasks/delete/${id}`, { withCredentials: true });
+      toast.success("Task Deleted");
+      onUpdate?.();
+    } catch (error: unknown) {
+  if (typeof error === 'object' && error !== null && 'message' in error) {
+    const message = (error as { message: string }).message;
+    toast.error(message);
+  } else {
+    toast.error('An unknown error occurred');
   }
-};
-const handleDelete = async(id)=>{
- try {
-  const response = await axios.delete(`/tasks/delete/${id}`,{withCredentials:true});
-  toast.success("Task Deleted");
-  onUpdate?.();
-  
- } catch (error:AxiosError) {
-  toast.error("Failed to Delete",error.message)
- }
 }
+  };
 
   const StatusIcon = statusConfig[localStatus]?.icon || Pause;
 
@@ -115,6 +162,7 @@ const handleDelete = async(id)=>{
               <button
                 onClick={() => setShowDropdown(!showDropdown)}
                 className="p-2 rounded-lg hover:bg-gray-100 transition-colors opacity-0 group-hover:opacity-100"
+                aria-label="Open task options"
               >
                 <MoreVertical size={18} className="text-gray-500" />
               </button>
@@ -127,26 +175,25 @@ const handleDelete = async(id)=>{
                       setEditMode(true);
                       setShowDropdown(false);
                       onEdit?.({
-                        id:task.id,
-                        status:localStatus,
-                        priority:localPriority,
-                        endTime:task.end_time,
-                      })
+                        id: task.id,
+                        status: localStatus,
+                        priority: localPriority,
+                        endTime: task.end_time,
+                      });
                     }}
                   >
                     <Edit3 size={14} />
                     Edit
                   </button>
-                   <button
-    className="flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 w-full text-left"
-    onClick={() => {
-      handleDelete(task.id);
-     
-    }}
-  >
-    <Trash2 size={14} />
-    Delete
-  </button>
+                  <button
+                    className="flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 w-full text-left"
+                    onClick={() => {
+                      handleDelete(task.id);
+                    }}
+                  >
+                    <Trash2 size={14} />
+                    Delete
+                  </button>
                 </div>
               )}
             </div>
@@ -195,7 +242,7 @@ const handleDelete = async(id)=>{
                   </div>
                   <div>
                     <p className="text-xs text-gray-500 font-medium">Duration</p>
-                    <p className="text-sm font-semibold text-gray-800">{task.duration}</p>
+                    <p className="text-sm font-semibold text-gray-800">{formattedDuration}</p>
                   </div>
                 </div>
               </>
@@ -224,7 +271,7 @@ const handleDelete = async(id)=>{
                   className="appearance-none bg-white border border-gray-300 rounded-lg px-4 py-2 pr-8 text-sm font-medium text-gray-700"
                   value={localPriority}
                   disabled={!editMode || updating}
-                  onChange={(e) => setLocalPriority(e.target.value)}
+                  onChange={(e) => setLocalPriority(e.target.value as Task["priority"])}
                 >
                   {priorityOptions.map((opt) => (
                     <option key={opt} value={opt}>
@@ -249,17 +296,13 @@ const handleDelete = async(id)=>{
                     onClick={() => setLocalStatus(status)}
                     className={`
                       flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200
-                      ${isActive 
-                        ? `bg-gradient-to-r ${statusConfig[status]?.gradient} text-white shadow-md` 
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200 hover:shadow-sm'
-                      }
-                      ${isDisabled ? 'cursor-not-allowed opacity-75' : 'hover:scale-105'}
+                      ${isActive
+                        ? `bg-gradient-to-r ${statusConfig[status]?.gradient} text-white shadow-md`
+                        : "bg-gray-100 text-gray-700 hover:bg-gray-200 hover:shadow-sm"}
+                      ${isDisabled ? "cursor-not-allowed opacity-75" : "hover:scale-105"}
                     `}
                   >
-                    <StatusButtonIcon
-                      size={14}
-                      className={status === "IN_PROGRESS" && isActive ? "animate-spin" : ""}
-                    />
+                    <StatusButtonIcon size={14} className={status === "IN_PROGRESS" && isActive ? "animate-spin" : ""} />
                     {status.replace("_", " ")}
                   </button>
                 );
@@ -267,7 +310,7 @@ const handleDelete = async(id)=>{
 
               {editMode && (
                 <button
-                  onClick={() => handleUpdate(localStatus, localPriority,task.id)}
+                  onClick={() => handleUpdate(localStatus, localPriority, task.id)}
                   disabled={updating}
                   className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition"
                 >
@@ -285,11 +328,8 @@ const handleDelete = async(id)=>{
           </div>
 
           {updating && (
-            <div className="absolute inset-0 bg-white bg-opacity-50 flex items-center justify-center rounded-2xl">
-              <div className="flex items-center gap-2 text-blue-600">
-                <Loader size={20} className="animate-spin" />
-                <span className="text-sm font-medium">Updating...</span>
-              </div>
+            <div className="absolute inset-0 bg-white/70 flex items-center justify-center rounded-2xl pointer-events-none">
+              <Loader size={32} className="animate-spin text-blue-600" />
             </div>
           )}
         </div>
