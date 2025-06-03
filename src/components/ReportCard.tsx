@@ -173,7 +173,7 @@ const ReportCard = ({ report, onDelete }) => {
                   size={16} 
                   className={`${report.status === 'PROCESSING' ? 'animate-spin' : ''} ${statusInfo.pulse ? 'animate-pulse' : ''}`} 
                 />
-                <span className="capitalize">{report.status.toLowerCase()}</span>
+                <span className="capitalize">{report?.status?.toLowerCase()}</span>
               </div>
             </div>
           </div>

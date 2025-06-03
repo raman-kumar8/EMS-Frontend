@@ -9,15 +9,21 @@ import { Task } from "./pages/Task"
 import NotFound from "./pages/NotFound"
 import ReportPage from "./pages/ReportPage"
 import AboutUs from "./pages/AboutUs"
+import {Leave} from "./pages/Leave"
+import ForgetPassword from "./pages/ForgetPassword"
+import ResetPassword from "./pages/ResetPassword"
+
 const App = () => {
     return <>
      
      <Routes>
+
       <Route path='/' element = {
         <ProtectedRoute>
             <Home/>
         </ProtectedRoute>
       } />
+
       <Route path="/task" element = {
         <ProtectedRoute>
             <Task/>
@@ -33,8 +39,16 @@ const App = () => {
           <AboutUs/>
         </ProtectedRoute>
       }/>
+       
+       <Route path="/leave" element={
+         <ProtectedRoute>
+           <Leave/>
+         </ProtectedRoute>
+       }/>
  
       <Route path="*" element={<NotFound/>}/>
+       <Route path="/forget" element={<ForgetPassword/>}/>
+       <Route path="/reset-password" element={<ResetPassword/>}/>
      <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
 <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
 

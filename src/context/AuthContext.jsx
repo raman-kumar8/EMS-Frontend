@@ -7,11 +7,11 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true); // new
+  const [loading, setLoading] = useState(true);
 
   const navigate = useNavigate();
 
-useEffect(() => {
+  // ✅ Move fetchDetails outside useEffect
   const fetchDetails = async () => {
     try {
       const userDetails = await axios.get(
@@ -22,32 +22,32 @@ useEffect(() => {
     } catch (error) {
       setUser(null);
     } finally {
-      setLoading(false); // ✅ done loading, success or fail
+      setLoading(false);
     }
   };
-  fetchDetails();
-}, []);
 
-  
-  const logout =()=>{
-    const helper  = async()=>{
+  useEffect(() => {
+    fetchDetails();
+  }, []);
+
+  const logout = () => {
+    const helper = async () => {
       try {
-        const response = await axios.get(`/users/users/logout`,{withCredentials:true});
-      toast.success("logout Succesfully");
-      setUser(null);
-      localStorage.removeItem("jwt_token");
-    
-      navigate("/login");
+        await axios.get(`/users/users/logout`, { withCredentials: true });
+        toast.success("Logout successfully");
+        setUser(null);
+        localStorage.removeItem("jwt_token");
+        navigate("/login");
       } catch (error) {
-        
+        console.error(error);
       }
-    }
+    };
     helper();
+  };
 
-  } ;
-
+  // ✅ Now fetchDetails is included in context
   return (
-    <AuthContext.Provider value={{ user,setUser, logout,loading }}>
+    <AuthContext.Provider value={{ user, setUser, logout, loading, fetchDetails }}>
       {children}
     </AuthContext.Provider>
   );
