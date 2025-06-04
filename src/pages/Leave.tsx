@@ -41,7 +41,7 @@ export const Leave = () => {
           { withCredentials: true }
         );
 
-        // Flatten and enrich each leave with user info
+        
         allLeaves = response.data.flatMap((adminUser) =>
           (adminUser.responseListDTOList || []).map((leave) => ({
             ...leave,
