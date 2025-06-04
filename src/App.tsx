@@ -2,7 +2,7 @@
 import {  Route, Routes } from "react-router"
 import Register from './pages/Register'
 import Login from "./pages/Login"
-import Home from "./pages/Home"
+
 import ProtectedRoute from "./components/ProtectedRoute"
 import PublicRoute from "./components/PublicRoute"
 import TaskPage from "./pages/TaskPage"
@@ -12,6 +12,7 @@ import AboutUs from "./pages/AboutUs"
 import {Leave} from "./pages/Leave"
 import ForgetPassword from "./pages/ForgetPassword"
 import ResetPassword from "./pages/ResetPassword"
+import HomePage from "./pages/HomePage"
 
 const App = () => {
     return <>
@@ -20,7 +21,7 @@ const App = () => {
 
       <Route path='/' element = {
         <ProtectedRoute>
-            <Home/>
+            <HomePage/>
         </ProtectedRoute>
       } />
 
