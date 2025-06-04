@@ -21,7 +21,7 @@ const Admin = () => {
 
 
  interface  LeaveRequest {
-   responseListDTOListresponse:Leave[],
+   responseListDTOList:Leave[],
   userDetails:User,
   userId:string,
  }
@@ -33,6 +33,7 @@ const Admin = () => {
       const response = await axios.get<LeaveRequest[]>('/leaves/admin/getAll', { 
         withCredentials: true 
       });
+      console.log(response)
       
       setLeaveRequests(response.data);
     } catch (error) {
@@ -52,6 +53,7 @@ const Admin = () => {
   // Load leave requests on component mount
   useEffect(() => {
     fetchLeaveRequests();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -116,6 +118,7 @@ useEffect(() => {
   };
 
   fetchTasksForUser();
+// eslint-disable-next-line react-hooks/exhaustive-deps
 }, [selectedUser]);
 
 
@@ -196,7 +199,7 @@ useEffect(() => {
 
   // Count pending leaves dynamically
   const pendingLeavesCount = leaveRequests.reduce((total, userRequest) => {
-    const pendingCount = userRequest.responseListDTOListresponse?.filter(
+    const pendingCount = userRequest.responseListDTOList?.filter(
       leave => leave.status?.toLowerCase() === 'pending'
     ).length || 0;
     return total + pendingCount;
@@ -353,17 +356,19 @@ useEffect(() => {
               <div className="text-center py-4">
                 <p className="text-gray-500">Loading leave requests...</p>
               </div>
+              
             ) : leaveRequests.length === 0 || leaveRequests.every(userRequest => 
-                !userRequest.responseListDTOListresponse?.some((leave:Leave) => leave.status?.toLowerCase() === 'pending')
+                !userRequest.responseListDTOList?.some((leave:Leave) => leave.status?.toLowerCase() === 'pending')
               ) ? (
               <div className="text-center py-4">
+                
                 <p className="text-gray-500">No pending leave requests</p>
               </div>
             ) : (
               <div className="space-y-4">
                 {leaveRequests
                   .flatMap(userRequest => 
-                    userRequest.responseListDTOListresponse
+                    userRequest.responseListDTOList
                       ?.filter(leave => leave.status?.toLowerCase() === 'pending')
                       ?.map(leave => ({
                         ...leave,

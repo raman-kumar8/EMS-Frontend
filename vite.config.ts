@@ -33,7 +33,7 @@ export default defineConfig({
         rewrite: path => path.replace(/^\/reports/, '/api/v1'),
       },
       '/leaves': {
-        target: 'http://ems-leave:8081',
+        target: 'http://ems-leave:8080',
         changeOrigin: true,
         rewrite: path => path.replace(/^\/leaves/, '/api/v1'),
       },
