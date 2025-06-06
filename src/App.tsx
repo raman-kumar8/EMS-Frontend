@@ -9,7 +9,7 @@ import TaskPage from "./pages/TaskPage"
 import NotFound from "./pages/NotFound"
 import ReportPage from "./pages/ReportPage"
 import AboutUs from "./pages/AboutUs"
-import {Leave} from "./pages/Leave"
+import LeavePage from "./pages/LeavePage"
 import ForgetPassword from "./pages/ForgetPassword"
 import ResetPassword from "./pages/ResetPassword"
 import HomePage from "./pages/HomePage"
@@ -43,7 +43,7 @@ const App = () => {
        
        <Route path="/leave" element={
          <ProtectedRoute>
-           <Leave/>
+           <LeavePage/>
          </ProtectedRoute>
        }/>
  

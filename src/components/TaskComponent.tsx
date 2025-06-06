@@ -81,17 +81,8 @@ const priorityConfig: Record<Task["priority"], {
 };
 
 
-  const duration = task.end_time
-    ? dayjs.duration(dayjs(task.end_time, "HH:mm:ss").diff(dayjs(task.start_time, "HH:mm:ss")))
-    : null;
 
-  const formattedDuration = duration
-    ? [
-        String(duration.hours()).padStart(2, "0"),
-        String(duration.minutes()).padStart(2, "0"),
-        String(duration.seconds()).padStart(2, "0"),
-      ].join(":")
-    : null;
+
 
   const handleUpdate = async (status: Task["taskStatus"], priority: Task["priority"], id: string) => {
     try {
@@ -242,7 +233,7 @@ const priorityConfig: Record<Task["priority"], {
                   </div>
                   <div>
                     <p className="text-xs text-gray-500 font-medium">Duration</p>
-                    <p className="text-sm font-semibold text-gray-800">{formattedDuration}</p>
+                    <p className="text-sm font-semibold text-gray-800">{task.duration}</p>
                   </div>
                 </div>
               </>
