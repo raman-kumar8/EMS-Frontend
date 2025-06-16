@@ -86,7 +86,7 @@ const Register = () => {
       setIsSubmitting(true);
       const payload = {
         name: data.username,
-        email: data.email,
+        email: data.email.toLowerCase(),
         password: data.password,
         role: data.role,
       };

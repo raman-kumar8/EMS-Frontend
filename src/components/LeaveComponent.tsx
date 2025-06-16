@@ -69,8 +69,10 @@ const LeaveComponent: React.FC<LeaveComponentProps> = ({
       onUpdate();
     }catch (error: unknown) {
   if (typeof error === 'object' && error !== null && 'message' in error) {
-    const message = (error as { message: string }).message;
-    toast.error(message);
+   const err = error as { response?: { data?: { message?: string } } };
+    
+  const serverMessage = err.response?.data?.message || 'Server error occurred';
+  toast.error(serverMessage);
   } else {
     toast.error('An unknown error occurred');
   }
