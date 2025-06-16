@@ -52,7 +52,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         localStorage.removeItem("jwt_token");
         navigate("/login");
       } catch (error) {
-        console.error(error);
+        const err = error as { response?: { data?: { message?: string } } };
+    
+  const serverMessage = err.response?.data?.message || 'Server error occurred';
+  toast.error(serverMessage);
       }
     };
     helper();

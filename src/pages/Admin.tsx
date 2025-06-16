@@ -37,8 +37,11 @@ const Admin = () => {
       
       setLeaveRequests(response.data);
     } catch (error) {
-      console.error('Error fetching leave requests:', error);
-      // Fallback to empty array if error
+       const err = error as { response?: { data?: { message?: string } } };
+    
+  const serverMessage = err.response?.data?.message || 'Server error occurred';
+  toast.error(serverMessage);
+     
       setLeaveRequests([]);
     } finally {
       setLoadingLeaves(false);

@@ -40,8 +40,10 @@ const fetchUserIdAndReports = async () => {
     
   } catch (error: unknown) {
   if (typeof error === 'object' && error !== null && 'message' in error) {
-    const message = (error as { message: string }).message;
-    toast.error(message);
+    const err = error as { response?: { data?: { message?: string } } };
+    
+  const serverMessage = err.response?.data?.message || 'Server error occurred';
+  toast.error(serverMessage);
   } else {
     toast.error('An unknown error occurred');
   }
@@ -58,8 +60,10 @@ const fetchReport = async ()=>{
     setReports(reportsData);
   } catch (error: unknown) {
   if (typeof error === 'object' && error !== null && 'message' in error) {
-    const message = (error as { message: string }).message;
-    toast.error(message);
+     const err = error as { response?: { data?: { message?: string } } };
+    
+  const serverMessage = err.response?.data?.message || 'Server error occurred';
+  toast.error(serverMessage);
   } else {
     toast.error('An unknown error occurred');
   }
@@ -109,8 +113,10 @@ useEffect(() => {
 
   }catch (error: unknown) {
   if (typeof error === 'object' && error !== null && 'message' in error) {
-    const message = (error as { message: string }).message;
-    toast.error(message);
+     const err = error as { response?: { data?: { message?: string } } };
+    
+  const serverMessage = err.response?.data?.message || 'Server error occurred';
+  toast.error(serverMessage);
   } else {
     toast.error('An unknown error occurred');
   }
@@ -124,8 +130,10 @@ const handleGenerateReport = async (request: GenerateReportRequest) => {
     fetchUserIdAndReports();
   } catch (error: unknown) {
   if (typeof error === 'object' && error !== null && 'message' in error) {
-    const message = (error as { message: string }).message;
-    toast.error(message);
+     const err = error as { response?: { data?: { message?: string } } };
+    
+  const serverMessage = err.response?.data?.message || 'Server error occurred';
+  toast.error(serverMessage);
   } else {
     toast.error('An unknown error occurred');
   }
