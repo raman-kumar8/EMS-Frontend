@@ -81,7 +81,7 @@ const Login = () => {
       toast.success("Login successful!");
       navigate("/");
     } catch (error: unknown) {
-      console.log(error)
+      
   if (typeof error === 'object' && error !== null && 'message' in error) {
     
     const err = error as { response?: { data?: { message?: string } } };

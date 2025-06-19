@@ -25,6 +25,7 @@ interface AddTaskModalProps {
   onClose: () => void;
   onTaskAdded?: () => void;
   update: () => void;
+  id:string;
 }
 
 type TaskPriority = "LOW" | "MEDIUM" | "HIGH";
@@ -38,13 +39,15 @@ interface TaskFormState {
   priority: TaskPriority;
   taskTag: string;
   startTime: string;
+
 }
 
-const AddTaskModal: React.FC<AddTaskModalProps> = ({
+const AdminAddTaskModal: React.FC<AddTaskModalProps> = ({
   open,
   onClose,
   onTaskAdded,
   update,
+  id
 }) => {
   const initialFormState: TaskFormState = {
     taskName: "",
@@ -53,6 +56,7 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({
     taskStatus: "PENDING",
     priority: "MEDIUM",
     taskTag: "",
+    
     startTime: dayjs().format("HH:mm:ss"),
   };
 
@@ -64,14 +68,12 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({
 
   const handleSubmit = async () => {
     try {
-      const findUserId = await axios.get<string>(`/users/general/validate`, {
-        withCredentials: true,
-      });
-      const userId = findUserId.data;
-      const assignedBy = "user";
+      
+      const userId = id;
+     const assignedBy="admin"
       await axios.post(
         `tasks/add`,
-        { ...form,assignedBy, userId, startTime: dayjs().format("HH:mm:ss") },
+        { ...form, userId,assignedBy, startTime: dayjs().format("HH:mm:ss") },
         { withCredentials: true }
       );
 
@@ -193,4 +195,4 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({
   );
 };
 
-export default AddTaskModal;
+export default AdminAddTaskModal;

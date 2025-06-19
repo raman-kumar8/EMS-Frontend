@@ -5,7 +5,7 @@ import Login from "./pages/Login"
 
 import ProtectedRoute from "./components/ProtectedRoute"
 import PublicRoute from "./components/PublicRoute"
-import TaskPage from "./pages/TaskPage"
+
 import NotFound from "./pages/NotFound"
 import ReportPage from "./pages/ReportPage"
 import AboutUs from "./pages/AboutUs"
@@ -13,6 +13,7 @@ import LeavePage from "./pages/LeavePage"
 import ForgetPassword from "./pages/ForgetPassword"
 import ResetPassword from "./pages/ResetPassword"
 import HomePage from "./pages/HomePage"
+import TaskRoutePage from "./pages/TaskRoutePage"
 
 const App = () => {
     return <>
@@ -27,7 +28,7 @@ const App = () => {
 
       <Route path="/task" element = {
         <ProtectedRoute>
-            <TaskPage/>
+            <TaskRoutePage/>
         </ProtectedRoute>
       }/>
       <Route path="/report" element = {

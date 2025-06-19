@@ -10,6 +10,8 @@ import {
   MoreVertical,
   Edit3,
   Trash2,
+  User,
+  ShieldCheck,
 } from "lucide-react";
 import { useState } from "react";
 import axios from "axios";
@@ -19,8 +21,7 @@ import toast from "react-hot-toast";
 
 import type Task from "@/interfaces/Task";
 
-dayjs.extend(durationPlugin);
-
+ dayjs.extend(durationPlugin);
 
 interface TaskComponentProps {
   task: Task;
@@ -43,46 +44,41 @@ const TaskComponent: React.FC<TaskComponentProps> = ({ task, onUpdate, onEdit })
   const statusOptions: Task["taskStatus"][] = ["PENDING", "IN_PROGRESS", "COMPLETED"];
   const priorityOptions: Task["priority"][] = ["LOW", "MEDIUM", "HIGH"];
 
-const priorityConfig: Record<Task["priority"], {
-  color: string;
-  dot: string;
-  gradient: string;
-}> = {
-  HIGH: { color: "bg-red-50 text-red-700 border-red-200", dot: "bg-red-500", gradient: "from-red-50 to-red-100" },
-  MEDIUM: { color: "bg-amber-50 text-amber-700 border-amber-200", dot: "bg-amber-500", gradient: "from-amber-50 to-amber-100" },
-  LOW: { color: "bg-emerald-50 text-emerald-700 border-emerald-200", dot: "bg-emerald-500", gradient: "from-emerald-50 to-emerald-100" },
-};
+  const priorityConfig: Record<Task["priority"], {
+    color: string;
+    dot: string;
+    gradient: string;
+  }> = {
+    HIGH: { color: "bg-red-50 text-red-700 border-red-200", dot: "bg-red-500", gradient: "from-red-50 to-red-100" },
+    MEDIUM: { color: "bg-amber-50 text-amber-700 border-amber-200", dot: "bg-amber-500", gradient: "from-amber-50 to-amber-100" },
+    LOW: { color: "bg-emerald-50 text-emerald-700 border-emerald-200", dot: "bg-emerald-500", gradient: "from-emerald-50 to-emerald-100" },
+  };
 
-
- const statusConfig: Record<Task["taskStatus"], {
-  color: string;
-  bg: string;
-  icon: React.ElementType;
-  gradient: string;
-}> = {
-  PENDING: {
-    color: "text-amber-600",
-    bg: "bg-amber-50",
-    icon: Pause,
-    gradient: "from-amber-400 to-orange-500",
-  },
-  IN_PROGRESS: {
-    color: "text-blue-600",
-    bg: "bg-blue-50",
-    icon: Loader,
-    gradient: "from-blue-400 to-indigo-500",
-  },
-  COMPLETED: {
-    color: "text-emerald-600",
-    bg: "bg-emerald-50",
-    icon: CheckCircle,
-    gradient: "from-emerald-400 to-green-500",
-  },
-};
-
-
-
-
+  const statusConfig: Record<Task["taskStatus"], {
+    color: string;
+    bg: string;
+    icon: React.ElementType;
+    gradient: string;
+  }> = {
+    PENDING: {
+      color: "text-amber-600",
+      bg: "bg-amber-50",
+      icon: Pause,
+      gradient: "from-amber-400 to-orange-500",
+    },
+    IN_PROGRESS: {
+      color: "text-blue-600",
+      bg: "bg-blue-50",
+      icon: Loader,
+      gradient: "from-blue-400 to-indigo-500",
+    },
+    COMPLETED: {
+      color: "text-emerald-600",
+      bg: "bg-emerald-50",
+      icon: CheckCircle,
+      gradient: "from-emerald-400 to-green-500",
+    },
+  };
 
   const handleUpdate = async (status: Task["taskStatus"], priority: Task["priority"], id: string) => {
     try {
@@ -114,15 +110,14 @@ const priorityConfig: Record<Task["priority"], {
       toast.success("Task Deleted");
       onUpdate?.();
     } catch (error: unknown) {
-  if (typeof error === 'object' && error !== null && 'message' in error) {
-   const err = error as { response?: { data?: { message?: string } } };
-    
-  const serverMessage = err.response?.data?.message || 'Server error occurred';
-  toast.error(serverMessage);
-  } else {
-    toast.error('An unknown error occurred');
-  }
-}
+      if (typeof error === "object" && error !== null && "message" in error) {
+        const err = error as { response?: { data?: { message?: string } } };
+        const serverMessage = err.response?.data?.message || 'Server error occurred';
+        toast.error(serverMessage);
+      } else {
+        toast.error('An unknown error occurred');
+      }
+    }
   };
 
   const StatusIcon = statusConfig[localStatus]?.icon || Pause;
@@ -136,8 +131,28 @@ const priorityConfig: Record<Task["priority"], {
           {/* Header */}
           <div className="flex items-start justify-between mb-4">
             <div className="flex-1">
-              <div className="flex items-center gap-3 mb-2">
+              <div className="flex items-center gap-3 mb-2 flex-wrap">
                 <h2 className="text-xl font-bold text-gray-800 line-clamp-1">{task.taskName}</h2>
+
+                {/* Assigned By Badge */}
+                <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border
+                  ${task.assignedBy.toLowerCase() === "admin"
+                    ? "bg-blue-50 text-blue-700 border-blue-200"
+                    : "bg-emerald-50 text-emerald-700 border-emerald-200"
+                  }`}>
+                  {task.assignedBy.toLowerCase() === "admin" ? (
+                    <>
+                      <ShieldCheck size={14} className="text-blue-600" />
+                      Assigned by Admin
+                    </>
+                  ) : (
+                    <>
+                      <User size={14} className="text-emerald-600" />
+                      Self Assigned
+                    </>
+                  )}
+                </div>
+
                 <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border ${priorityConfig[localPriority]?.color}`}>
                   <div className={`w-2 h-2 rounded-full ${priorityConfig[localPriority]?.dot}`}></div>
                   {localPriority}
@@ -290,8 +305,8 @@ const priorityConfig: Record<Task["priority"], {
                     className={`
                       flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200
                       ${isActive
-                        ? `bg-gradient-to-r ${statusConfig[status]?.gradient} text-white shadow-md`
-                        : "bg-gray-100 text-gray-700 hover:bg-gray-200 hover:shadow-sm"}
+                      ? `bg-gradient-to-r ${statusConfig[status]?.gradient} text-white shadow-md`
+                      : "bg-gray-100 text-gray-700 hover:bg-gray-200 hover:shadow-sm"}
                       ${isDisabled ? "cursor-not-allowed opacity-75" : "hover:scale-105"}
                     `}
                   >

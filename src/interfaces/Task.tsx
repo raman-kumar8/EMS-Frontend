@@ -15,5 +15,6 @@ export default interface Task{
     updated_at:string,
     user_id:string,
     duration:string,
+    assignedBy:string
 
 }
