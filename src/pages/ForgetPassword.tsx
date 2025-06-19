@@ -14,7 +14,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Mail, Send } from "lucide-react";
 import toast from "react-hot-toast";
-
+import axios from "axios";
 import { useState } from "react";
 
 
@@ -40,12 +40,17 @@ const ForgetPassword = () => {
   const onSubmit: SubmitHandler<ForgetPasswordFormValues> = async (data) => {
     try {
       setIsSubmitting(true);
-      await axios.post("/users/users/forget", data); 
+      data.email = data.email.toLowerCase();
+      await axios.post("/users/users/forget", data,{withCredentials:true}); 
       toast.success("Password reset link sent to your email.");
-    } catch (error: unknown) {
+    }  catch (error: unknown) {
+      console.log(error)
   if (typeof error === 'object' && error !== null && 'message' in error) {
-    const message = (error as { message: string }).message;
-    toast.error(message);
+    
+    const err = error as { response?: { data?: { message?: string } } };
+    
+  const serverMessage = err.response?.data?.message || 'Server error occurred';
+  toast.error(serverMessage);
   } else {
     toast.error('An unknown error occurred');
   }
