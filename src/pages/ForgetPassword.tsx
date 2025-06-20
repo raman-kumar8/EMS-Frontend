@@ -40,7 +40,8 @@ const ForgetPassword = () => {
   const onSubmit: SubmitHandler<ForgetPasswordFormValues> = async (data) => {
     try {
       setIsSubmitting(true);
-      await axios.post("/users/users/forget", data); 
+      data.email = data.email.toLowerCase();
+      await axios.post("/users/users/forget", data,{withCredentials:true}); 
       toast.success("Password reset link sent to your email.");
     }catch (error: unknown) {
       

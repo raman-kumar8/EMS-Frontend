@@ -58,7 +58,7 @@ const ResetPassword = () => {
     } catch (error: unknown) {
   if (typeof error === 'object' && error !== null && 'message' in error) {
     const err = error as { response?: { data?: { message?: string } } };
-    
+    console.log(error)
   const serverMessage = err.response?.data?.message || 'Server error occurred';
   toast.error(serverMessage);
   } else {
