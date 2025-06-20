@@ -1,6 +1,6 @@
 
 import { Users, Target, Award, Heart } from 'lucide-react';
-
+import {Link} from 'react-router-dom';
 const AboutUs = () => {
   return (
     <div className="min-h-screen bg-gray-50">
@@ -126,9 +126,11 @@ const AboutUs = () => {
           <p className="text-blue-100 mb-6 text-lg">
             Join thousands of users who have transformed their productivity with TaskMate.
           </p>
-          <button className="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors">
-            Start Your Journey
-          </button>
+         <Link to="/">
+     <button className="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors">
+    Start Your Journey
+  </button>
+      </Link>
         </div>
       </div>
     </div>

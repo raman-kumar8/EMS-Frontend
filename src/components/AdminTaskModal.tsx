@@ -36,6 +36,15 @@ const AdminTaskModal: React.FC<AddAdminTaskModalProps> = ({
   useEffect(() => {
     findAllUser();
   }, []);
+  
+  useEffect(() => {
+  if (!open) {
+    // Modal is closing – reset state
+    setSearch("");
+    setUsers(allUsers);
+  }
+}, [open, allUsers]);
+
 
   const findAllUser = async () => {
     try {
@@ -138,11 +147,19 @@ const AdminTaskModal: React.FC<AddAdminTaskModalProps> = ({
             )}
           </div>
 
-          <DialogFooter className="pt-4">
-            <Button variant="outline" onClick={onClose}>
-              Close
-            </Button>
-          </DialogFooter>
+         <DialogFooter className="pt-4">
+     <Button
+       variant="outline"
+       onClick={() => {
+      setSearch("");
+      setUsers(allUsers);
+      onClose();
+    }}
+  >
+    Close
+  </Button>
+</DialogFooter>
+
         </DialogContent>
       </Dialog>
 

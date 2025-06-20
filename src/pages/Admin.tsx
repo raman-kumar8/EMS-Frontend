@@ -340,96 +340,85 @@ useEffect(() => {
           )}
         </div>
 
-        {/* Sidebar */}
-        <div className="space-y-6">
-          {/* Dynamic Leave Requests */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 max-h-[600px] overflow-y-auto">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">Pending Leave Requests</h3>
-              <button
-                onClick={fetchLeaveRequests}
-                className="text-blue-600 hover:text-blue-800 text-sm"
-                disabled={loadingLeaves}
-              >
-                {loadingLeaves ? 'Loading...' : 'Refresh'}
-              </button>
-            </div>
-            
-            {loadingLeaves ? (
-              <div className="text-center py-4">
-                <p className="text-gray-500">Loading leave requests...</p>
-              </div>
-              
-            ) : leaveRequests.length === 0 || leaveRequests.every(userRequest => 
-                !userRequest.responseListDTOList?.some((leave:Leave) => leave.status?.toLowerCase() === 'pending')
-              ) ? (
-              <div className="text-center py-4">
-                
-                <p className="text-gray-500">No pending leave requests</p>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {leaveRequests
-                  .flatMap(userRequest => 
-                    userRequest.responseListDTOList
-                      ?.filter(leave => leave.status?.toLowerCase() === 'pending')
-                      ?.map(leave => ({
-                        ...leave,
-                        userDetails: userRequest.userDetails
-                      })) || []
-                  )
-                  .map((request) => (
-                    <div
-                      key={request.leaveId}
-                      className="p-4 border border-gray-300 rounded-lg flex flex-col space-y-2"
-                    >
-                      <p><strong>Name:</strong> {request.userDetails?.name || 'N/A'}</p>
-                      <p><strong>Email:</strong> {request.userDetails?.email || 'N/A'}</p>
-                      <p><strong>Role:</strong> {request.userDetails?.role || 'N/A'}</p>
-                      <p><strong>Available Leaves:</strong> {request.userDetails?.leaveCount || 0}</p>
-                      <p><strong>Dates:</strong> {formatDateRange(
-                        request.startDate, 
-                        request.endDate
-                      )}</p>
-                      <p><strong>Reason:</strong> {request.reason || 'N/A'}</p>
-                      <span className={`px-2 py-1 text-xs font-medium text-white rounded-full ${getStatusColor(request.status)} w-fit`}>
-                        {(request.status || 'PENDING').toUpperCase()}
-                      </span>
-                      
-                      <div className="flex space-x-4 mt-2">
-                        <button
-                          onClick={() => {
-                            handleLeaveAction(request.leaveId, 'approve');
-                            toast.success('Leave request approved');
-                            fetchLeaveRequests();
-                          }}
-                          className="flex items-center px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600"
-                        >
-                          <Check className="mr-1 h-4 w-4" /> Approve
-                        </button>
-                        <button
-                          onClick={() => {
-                            handleLeaveAction(request.leaveId, 'reject');
-                            toast.success('Leave request rejected');
-                            fetchLeaveRequests();
-                          }}
-                          className="flex items-center px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
-                        >
-                          <X className="mr-1 h-4 w-4" /> Reject
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-              </div>
-            )}
-          </div>
+    {/* Sidebar - Only Leave Requests, full height */}
+<div className="flex flex-col h-full">
+  <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 flex-1 overflow-y-auto">
+    <div className="flex items-center justify-between mb-4">
+      <h3 className="text-lg font-semibold text-gray-900">Pending Leave Requests</h3>
+      <button
+        onClick={fetchLeaveRequests}
+        className="text-blue-600 hover:text-blue-800 text-sm"
+        disabled={loadingLeaves}
+      >
+        {loadingLeaves ? 'Loading...' : 'Refresh'}
+      </button>
+    </div>
 
-          {/* Generate Task Placeholder */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Generate Task</h3>
-            <p className="text-gray-600">Coming soon...</p>
-          </div>
-        </div>
+    {loadingLeaves ? (
+      <div className="text-center py-4">
+        <p className="text-gray-500">Loading leave requests...</p>
+      </div>
+    ) : leaveRequests.length === 0 || leaveRequests.every(userRequest =>
+        !userRequest.responseListDTOList?.some((leave: Leave) => leave.status?.toLowerCase() === 'pending')
+      ) ? (
+      <div className="text-center py-4">
+        <p className="text-gray-500">No pending leave requests</p>
+      </div>
+    ) : (
+      <div className="space-y-4">
+        {leaveRequests
+          .flatMap(userRequest =>
+            userRequest.responseListDTOList
+              ?.filter(leave => leave.status?.toLowerCase() === 'pending')
+              ?.map(leave => ({
+                ...leave,
+                userDetails: userRequest.userDetails
+              })) || []
+          )
+          .map((request) => (
+            <div
+              key={request.leaveId}
+              className="p-4 border border-gray-300 rounded-lg flex flex-col space-y-2"
+            >
+              <p><strong>Name:</strong> {request.userDetails?.name || 'N/A'}</p>
+              <p><strong>Email:</strong> {request.userDetails?.email || 'N/A'}</p>
+              <p><strong>Role:</strong> {request.userDetails?.role || 'N/A'}</p>
+              <p><strong>Available Leaves:</strong> {request.userDetails?.leaveCount || 0}</p>
+              <p><strong>Dates:</strong> {formatDateRange(request.startDate, request.endDate)}</p>
+              <p><strong>Reason:</strong> {request.reason || 'N/A'}</p>
+              <span className={`px-2 py-1 text-xs font-medium text-white rounded-full ${getStatusColor(request.status)} w-fit`}>
+                {(request.status || 'PENDING').toUpperCase()}
+              </span>
+
+              <div className="flex space-x-4 mt-2">
+                <button
+                  onClick={async () => {
+                    await handleLeaveAction(request.leaveId, 'approve');
+                    toast.success('Leave request approved');
+                    fetchLeaveRequests();
+                  }}
+                  className="flex items-center px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600"
+                >
+                  <Check className="mr-1 h-4 w-4" /> Approve
+                </button>
+                <button
+                  onClick={async () => {
+                    await handleLeaveAction(request.leaveId, 'reject');
+                    toast.success('Leave request rejected');
+                    fetchLeaveRequests();
+                  }}
+                  className="flex items-center px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+                >
+                  <X className="mr-1 h-4 w-4" /> Reject
+                </button>
+              </div>
+            </div>
+          ))}
+      </div>
+    )}
+  </div>
+</div>
+
       </div>
     </div>
   );
