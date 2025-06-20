@@ -107,7 +107,7 @@ const Login = () => {
               <div className="h-16 w-16 bg-indigo-100 rounded-full flex items-center justify-center mb-3">
                 <LogIn className="h-8 w-8 text-indigo-600" />
               </div>
-              <h2 className="text-2xl font-bold text-gray-800">Welcome Back</h2>
+              <h2 className="text-2xl font-bold text-gray-800">Welcome, Back</h2>
               <p className="text-gray-500 mt-1">Sign in to your account</p>
             </div>
 
