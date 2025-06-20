@@ -54,10 +54,11 @@ const AddLeaveModal: React.FC<AddLeaveModalProps> = ({ open, onClose, onAddSucce
       onAddSuccess?.();
       onClose();
     } catch (error: unknown) {
+     
   if (typeof error === 'object' && error !== null && 'message' in error) {
-   const err = error as { response?: { data?: { message?: string } } };
+   const err = error as { response?: { data?: { errors?: string } } };
     
-  const serverMessage = err.response?.data?.message || 'Server error occurred';
+  const serverMessage = err.response?.data?.errors || 'Server error occurred';
   toast.error(serverMessage);
   } else {
     toast.error('An unknown error occurred');
