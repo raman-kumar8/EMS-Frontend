@@ -26,7 +26,7 @@ const TaskPage: React.FC = () => {
     try {
       const res = await axios.get<Task[]>(`/tasks/getAll`, { withCredentials: true });
       setTaskList(res.data);
-      console.log(res.data);
+     
     } catch (error: unknown) {
       if (typeof error === "object" && error !== null && "message" in error) {
         toast.error((error as { message: string }).message);

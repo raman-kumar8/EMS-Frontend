@@ -30,6 +30,8 @@ const AdminTaskModal: React.FC<AddAdminTaskModalProps> = ({
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [taskModalOpen, setTaskModalOpen] = useState(false);
   const [users, setUsers] = useState<User[]>([]);
+  const [allUsers, setAllUsers] = useState<User[]>([]);
+
 
   useEffect(() => {
     findAllUser();
@@ -40,8 +42,9 @@ const AdminTaskModal: React.FC<AddAdminTaskModalProps> = ({
       const response = await axios.get<User[]>(`/users/users/getAll`, {
         withCredentials: true,
       });
-      response.data = response.data.filter((data) => data.role === "user");
-      setUsers(response.data);
+     const filtered = response.data.filter((data) => data.role === "user");
+    setAllUsers(filtered);
+    setUsers(filtered); // also set the users to display initially
     } catch (error: unknown) {
       if (typeof error === "object" && error !== null && "message" in error) {
         const err = error as { response?: { data?: { message?: string } } };
@@ -56,7 +59,21 @@ const AdminTaskModal: React.FC<AddAdminTaskModalProps> = ({
   const handleSearch = async () => {
     if (!search.trim()) return;
     try {
-      console.log(users); // Optional: Implement search filtering here if needed
+       const keyword = search.toLowerCase();
+
+    const filteredUsers = allUsers.filter(
+      (user) =>
+        user.name.toLowerCase().includes(keyword) ||
+        user.email.toLowerCase().includes(keyword)
+    );
+
+    if (filteredUsers.length === 0) {
+      toast.error("No users found matching your search.");
+    }
+
+    setUsers(filteredUsers);
+    
+     
     } catch (error) {
       
       

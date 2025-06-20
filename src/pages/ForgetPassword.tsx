@@ -17,7 +17,7 @@ import toast from "react-hot-toast";
 
 import { useState } from "react";
 
-
+import axios from "axios";
 const formSchema = z.object({
   email: z
     .string()
@@ -42,10 +42,14 @@ const ForgetPassword = () => {
       setIsSubmitting(true);
       await axios.post("/users/users/forget", data); 
       toast.success("Password reset link sent to your email.");
-    } catch (error: unknown) {
+    }catch (error: unknown) {
+      
   if (typeof error === 'object' && error !== null && 'message' in error) {
-    const message = (error as { message: string }).message;
-    toast.error(message);
+    
+    const err = error as { response?: { data?: { message?: string } } };
+    
+  const serverMessage = err.response?.data?.message || 'Server error occurred';
+  toast.error(serverMessage);
   } else {
     toast.error('An unknown error occurred');
   }

@@ -33,7 +33,7 @@ const Admin = () => {
       const response = await axios.get<LeaveRequest[]>('/leaves/admin/getAll', { 
         withCredentials: true 
       });
-      console.log(response)
+     
       
       setLeaveRequests(response.data);
     } catch (error) {
