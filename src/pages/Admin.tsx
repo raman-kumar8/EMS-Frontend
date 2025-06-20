@@ -292,10 +292,10 @@ const Admin: React.FC = () => {
         </div>
 
         {/* Sidebar */}
-        <div className="space-y-6">
+        <div className="space-y-6 ">
           {/* Pending leaves */}
-          <div className="bg-white rounded-2xl shadow-md border border-gray-200 p-6 max-h-[600px] overflow-y-auto">
-            <div className="flex justify-between items-center mb-4">
+          <div className="bg-white rounded-2xl  shadow-md border border-gray-200 p-6 min-h-full overflow-y-auto ">
+            <div className="flex justify-between items-center mb-4 " >
               <h3 className="text-xl font-semibold text-gray-900">Pending Leaves</h3>
               <button
                 onClick={fetchLeaveRequests}
@@ -351,10 +351,7 @@ const Admin: React.FC = () => {
             )}
           </div>
           {/* Task generation placeholder */}
-          <div className="bg-white rounded-2xl shadow-md border border-gray-200 p-6">
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">Generate Task</h3>
-            <p className="text-gray-500">Coming soon…</p>
-          </div>
+          
         </div>
       </div>
     </div>
