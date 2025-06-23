@@ -17,7 +17,7 @@ import { Input } from "@/components/ui/input";
 import { useEffect, useState } from "react";
 import { Eye, EyeOff, Mail, LogIn } from "lucide-react";
 import toast from "react-hot-toast";
-import type { AuthContextType } from "@/interfaces/AuthContextType";
+
 import type User from "@/interfaces/User";
 
 
@@ -40,7 +40,7 @@ type LoginFormData = z.infer<typeof formSchema>;
 
 const Login = () => {
   const navigate = useNavigate();
-  const { user, setUser, loading } = useAuth() as AuthContextType;
+  const { user, setUser, loading } = useAuth() ;
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -86,7 +86,7 @@ const Login = () => {
     
     const err = error as { response?: { data?: { message?: string } } };
     
-  const serverMessage = err.response?.data?.message || 'Server error occurred';
+  const serverMessage = err.response?.data?.message ?? 'Server error occurred';
   toast.error(serverMessage);
   } else {
     toast.error('An unknown error occurred');
@@ -143,12 +143,12 @@ const Login = () => {
                     <FormItem>
                       <div className="flex items-center justify-between">
                         <FormLabel>Password</FormLabel>
-                        <a
+                        <button
                           onClick={() => navigate("/forget")}
                           className="text-xs font-medium text-indigo-600 hover:text-indigo-500 cursor-pointer"
                         >
                           Forgot password?
-                        </a>
+                        </button>
                       </div>
                       <div className="relative">
                         <FormControl>
@@ -159,12 +159,12 @@ const Login = () => {
                             {...field}
                           />
                         </FormControl>
-                        <div
+                        <button
                           onClick={() => setShowPassword(!showPassword)}
                           className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-400 hover:text-gray-600"
                         >
                           {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                        </div>
+                        </button>
                       </div>
                       <FormMessage />
                     </FormItem>
@@ -178,8 +178,7 @@ const Login = () => {
                 >
                   {isSubmitting ? (
                     <>
-                      <span className="mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-                      Signing in...
+                      <span className="mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>Signing in...
                     </>
                   ) : (
                     <>

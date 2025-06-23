@@ -13,7 +13,8 @@ import type Task from "@/interfaces/Task.tsx";
 
 const Home = () => {
     const { user , fetchDetails } = useAuth();
-    const [, setUserId] = useState<string>("");
+
+  const [, setUserId] = useState<string>("");
     const navigate = useNavigate();
     const [taskList, setTaskList] = useState<Task[]>([]);
     const [report, setReportList] = useState<Report[]>([]);
@@ -28,7 +29,7 @@ const Home = () => {
   if (typeof error === 'object' && error !== null && 'message' in error) {
      const err = error as { response?: { data?: { message?: string } } };
     
-  const serverMessage = err.response?.data?.message || 'Server error occurred';
+  const serverMessage = err.response?.data?.message ?? 'Server error occurred';
   toast.error(serverMessage);
   } else {
     toast.error('An unknown error occurred');
@@ -84,7 +85,7 @@ const Home = () => {
                             </div>
                             <div>
                                 <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">
-                                    Good morning, <span className="text-blue-600">{user?.name || 'User'}</span>
+                                    Good morning, <span className="text-blue-600">{user?.name ?? 'User'}</span>
                                 </h1>
                                 <p className="text-gray-600 font-medium mt-1">Ready to tackle today's challenges?</p>
                             </div>
@@ -104,14 +105,14 @@ const Home = () => {
                                     <div className="h-20 w-20 rounded-2xl bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center shadow-lg">
                                        <User className="h-8 w-8 text-white" />
                                     </div>
-                                    <h2 className="text-lg font-bold text-gray-900 mt-4">{user?.name || 'User Name'}</h2>
-                                    <p className="text-blue-600 font-semibold text-sm">{user?.role || 'Department'}</p>
+                                    <h2 className="text-lg font-bold text-gray-900 mt-4">{user?.name ?? 'User Name'}</h2>
+                                    <p className="text-blue-600 font-semibold text-sm">{user?.role ?? 'Department'}</p>
                                 </div>
                             </CardHeader>
                             <CardContent className="space-y-3 p-6">
                                 <div className="flex items-center gap-3 text-gray-700 p-3 rounded-lg bg-gray-50">
                                     <Mail className="h-4 w-4 text-gray-500" />
-                                    <span className="text-sm font-medium truncate">{user?.email || 'user@example.com'}</span>
+                                    <span className="text-sm font-medium truncate">{user?.email ?? 'user@example.com'}</span>
                                 </div>
                               
                               

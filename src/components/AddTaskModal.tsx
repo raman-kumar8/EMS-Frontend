@@ -84,7 +84,7 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({
   if (typeof error === 'object' && error !== null && 'message' in error) {
     const err = error as { response?: { data?: { message?: string } } };
     
-  const serverMessage = err.response?.data?.message || 'Server error occurred';
+  const serverMessage = err.response?.data?.message ?? 'Server error occurred';
   toast.error(serverMessage);
   } else {
     toast.error('An unknown error occurred');
@@ -103,39 +103,43 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({
 
         <div className="grid gap-4 py-4">
           <div className="grid gap-2">
-            <label className="text-sm font-medium text-blue-900">Task Name</label>
+            <label className="text-sm font-medium text-blue-900">
             <Input
               placeholder="Enter task name"
               value={form.taskName}
               onChange={(e) => handleChange("taskName", e.target.value)}
             />
+              Task Name</label>
           </div>
 
           <div className="grid gap-2">
-            <label className="text-sm font-medium text-blue-900">Description</label>
+            <label className="text-sm font-medium text-blue-900">
             <Textarea
               placeholder="Write task description..."
               value={form.description}
               onChange={(e) => handleChange("description", e.target.value)}
             />
+              Description</label>
           </div>
 
           <div className="grid gap-2">
-            <label className="text-sm font-medium text-blue-900">Title</label>
+            <label className="text-sm font-medium text-blue-900">
             <Input
               placeholder="Enter title"
               value={form.title}
               onChange={(e) => handleChange("title", e.target.value)}
             />
+              Title</label>
           </div>
 
           <div className="grid gap-2">
-            <label className="text-sm font-medium text-blue-900">Tag</label>
+            <label className="text-sm font-medium text-blue-900">
             <Input
               placeholder="e.g. Frontend, Backend"
               value={form.taskTag}
               onChange={(e) => handleChange("taskTag", e.target.value)}
             />
+              Tag</label>
           </div>
 
           <div className="grid gap-2">

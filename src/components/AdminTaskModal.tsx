@@ -57,7 +57,7 @@ const AdminTaskModal: React.FC<AddAdminTaskModalProps> = ({
     } catch (error: unknown) {
       if (typeof error === "object" && error !== null && "message" in error) {
         const err = error as { response?: { data?: { message?: string } } };
-        const serverMessage = err.response?.data?.message || "Server error occurred";
+        const serverMessage = err.response?.data?.message ?? "Server error occurred";
         toast.error(serverMessage);
       } else {
         toast.error("An unknown error occurred");
@@ -90,7 +90,7 @@ const AdminTaskModal: React.FC<AddAdminTaskModalProps> = ({
           
           const err = error as { response?: { data?: { message?: string } } };
           
-        const serverMessage = err.response?.data?.message || 'Server error occurred';
+        const serverMessage = err.response?.data?.message ?? 'Server error occurred';
         toast.error(serverMessage);
         } else {
           toast.error('An unknown error occurred');
@@ -134,14 +134,15 @@ const AdminTaskModal: React.FC<AddAdminTaskModalProps> = ({
             {users.length > 0 && (
               <div className="border rounded-md p-2 max-h-60 overflow-y-auto">
                 {users.map((user) => (
-                  <div
+                  <button
+
                     key={user.id}
                     className="p-2 hover:bg-blue-100 rounded cursor-pointer"
                     onClick={() => handleUserSelect(user)}
                   >
                     <div className="font-medium">{user.name}</div>
                     <div className="text-sm text-gray-600">{user.email}</div>
-                  </div>
+                  </button>
                 ))}
               </div>
             )}

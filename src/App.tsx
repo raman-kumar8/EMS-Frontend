@@ -16,7 +16,7 @@ import HomePage from "./pages/HomePage"
 import TaskRoutePage from "./pages/TaskRoutePage"
 
 const App = () => {
-    return <>
+    return <div>
      
      <Routes>
 
@@ -58,7 +58,7 @@ const App = () => {
         
         </Routes>   
     
-    </>
+    </div>
 }
 
 export default App

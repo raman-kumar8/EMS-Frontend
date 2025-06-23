@@ -59,7 +59,7 @@ const ResetPassword = () => {
   if (typeof error === 'object' && error !== null && 'message' in error) {
     const err = error as { response?: { data?: { message?: string } } };
     console.log(error)
-  const serverMessage = err.response?.data?.message || 'Server error occurred';
+  const serverMessage = err.response?.data?.message ?? 'Server error occurred';
   toast.error(serverMessage);
   } else {
     toast.error('An unknown error occurred');
@@ -95,12 +95,12 @@ const ResetPassword = () => {
                         {...field}
                       />
                     </FormControl>
-                    <div
+                    <button
                       onClick={() => setShowPassword(!showPassword)}
                       className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-400"
                     >
                       {showPassword ? <EyeOff /> : <Eye />}
-                    </div>
+                    </button>
                   </div>
                   <FormMessage />
                 </FormItem>

@@ -49,7 +49,7 @@ const ForgetPassword = () => {
     
     const err = error as { response?: { data?: { message?: string } } };
     
-  const serverMessage = err.response?.data?.message || 'Server error occurred';
+  const serverMessage = err.response?.data?.message ?? 'Server error occurred';
   toast.error(serverMessage);
   } else {
     toast.error('An unknown error occurred');
@@ -108,8 +108,7 @@ const ForgetPassword = () => {
                 >
                   {isSubmitting ? (
                     <>
-                      <span className="mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-                      Sending link...
+                      <span className="mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>Sending link...
                     </>
                   ) : (
                     <>

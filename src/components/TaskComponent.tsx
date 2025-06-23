@@ -112,7 +112,7 @@ const TaskComponent: React.FC<TaskComponentProps> = ({ task, onUpdate, onEdit })
     } catch (error: unknown) {
       if (typeof error === "object" && error !== null && "message" in error) {
         const err = error as { response?: { data?: { message?: string } } };
-        const serverMessage = err.response?.data?.message || 'Server error occurred';
+        const serverMessage = err.response?.data?.message ?? 'Server error occurred';
         toast.error(serverMessage);
       } else {
         toast.error('An unknown error occurred');
@@ -121,7 +121,7 @@ const TaskComponent: React.FC<TaskComponentProps> = ({ task, onUpdate, onEdit })
   };
 
   const StatusIcon = statusConfig[localStatus]?.icon || Pause;
-
+ console.log(task)
   return (
     <div className="group w-full max-w-2xl mx-auto mb-6 relative">
       <div className="bg-white rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 overflow-hidden">
@@ -186,7 +186,7 @@ const TaskComponent: React.FC<TaskComponentProps> = ({ task, onUpdate, onEdit })
                         id: task.id,
                         status: localStatus,
                         priority: localPriority,
-                        endTime: task.end_time,
+                        endTime: task.endTime,
                       });
                     }}
                   >
@@ -228,11 +228,11 @@ const TaskComponent: React.FC<TaskComponentProps> = ({ task, onUpdate, onEdit })
               </div>
               <div>
                 <p className="text-xs text-gray-500 font-medium">Start Time</p>
-                <p className="text-sm font-semibold text-gray-800">{task.start_time}</p>
+                <p className="text-sm font-semibold text-gray-800">{task.startTime}</p>
               </div>
             </div>
 
-            {task.end_time && (
+            {task.endTime && (
               <>
                 <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
                   <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
@@ -240,7 +240,7 @@ const TaskComponent: React.FC<TaskComponentProps> = ({ task, onUpdate, onEdit })
                   </div>
                   <div>
                     <p className="text-xs text-gray-500 font-medium">End Time</p>
-                    <p className="text-sm font-semibold text-gray-800">{task.end_time}</p>
+                    <p className="text-sm font-semibold text-gray-800">{task.endTime}</p>
                   </div>
                 </div>
 
@@ -250,6 +250,7 @@ const TaskComponent: React.FC<TaskComponentProps> = ({ task, onUpdate, onEdit })
                   </div>
                   <div>
                     <p className="text-xs text-gray-500 font-medium">Duration</p>
+                    
                     <p className="text-sm font-semibold text-gray-800">{task.duration}</p>
                   </div>
                 </div>
@@ -279,7 +280,7 @@ const TaskComponent: React.FC<TaskComponentProps> = ({ task, onUpdate, onEdit })
                   className="appearance-none bg-white border border-gray-300 rounded-lg px-4 py-2 pr-8 text-sm font-medium text-gray-700"
                   value={localPriority}
                   disabled={!editMode || updating}
-                  onChange={(e) => setLocalPriority(e.target.value as Task["priority"])}
+                  onChange={(e) => setLocalPriority(e.target.value)}
                 >
                   {priorityOptions.map((opt) => (
                     <option key={opt} value={opt}>

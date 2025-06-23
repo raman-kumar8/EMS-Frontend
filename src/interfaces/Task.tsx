@@ -1,19 +1,19 @@
 export default interface Task{
-    created_at:string,
+    createdAt:string,
     description:string,
-    end_time:string,
+    endTime:string,
     id:string,
     priority:string,
     tag:{
         id:number,
         tag:'string',
     },
-    start_time:string,
+    startTime:string,
     taskName:string,
     taskStatus:string,
     title:string,
-    updated_at:string,
-    user_id:string,
+    updatedAt:string,
+    userId:string,
     duration:string,
     assignedBy:string
 

@@ -98,7 +98,6 @@ const statusConfig = {
 } as const;
 
 
-type StatusType = keyof typeof statusConfig;
 
 interface ReportCardProps {
   report: Report;
@@ -110,10 +109,10 @@ const ReportCard: React.FC<ReportCardProps> = ({ report, onDelete }) => {
   const [isDeleting, setIsDeleting] = useState(false);
 
   // Fixing this line to use the report.status correctly typed
-  const StatusIcon = statusConfig[report.status as StatusType]?.icon ?? Clock;
+  const StatusIcon = statusConfig[report.status]?.icon ?? Clock;
   
 
-  const statusInfo = statusConfig[report.status as StatusType] ?? statusConfig.PENDING;
+  const statusInfo = statusConfig[report.status] ?? statusConfig.PENDING;
   
 
   // Format dates
@@ -180,7 +179,9 @@ const ReportCard: React.FC<ReportCardProps> = ({ report, onDelete }) => {
                   <>
                     <button
                       onClick={() => {
-                        const cleanUrl = report.s3Url?.replace(/^"+|"+$/g, '') ?? '';
+
+                        const cleanUrl = report.s3Url?.replace(/(^"+)|("+$)/g, '') ?? '';
+
                         window.open(cleanUrl, '_blank');
                         setShowDropdown(false);
                       }}
@@ -193,7 +194,8 @@ const ReportCard: React.FC<ReportCardProps> = ({ report, onDelete }) => {
                     <button
                       onClick={async () => {
                         try {
-                          const cleanUrl = report.s3Url?.replace(/^"+|"+$/g, '') ?? '';
+                          const cleanUrl = report.s3Url?.replace(/(^"+)|("+$)/g, '') ?? '';
+
                           const response = await fetch(cleanUrl);
                           if (!response.ok) throw new Error('Network response was not ok');
                           const blob = await response.blob();
@@ -201,7 +203,7 @@ const ReportCard: React.FC<ReportCardProps> = ({ report, onDelete }) => {
 
                           const a = document.createElement('a');
                           a.href = url;
-                          a.download = cleanUrl.split('/').pop() || 'report.pdf';
+                          a.download = cleanUrl.split('/').pop() ?? 'report.pdf';
                           document.body.appendChild(a);
                           a.click();
                           a.remove();

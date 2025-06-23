@@ -8,7 +8,7 @@ import{AuthProvider} from "./context/AuthContext.js";
 import { BrowserRouter } from "react-router-dom";
 
 createRoot(document.getElementById("root")!).render(
-  <>
+  <div>
   <BrowserRouter>
     <Toaster position="top-right" />
     <ErrorBoundary>
@@ -18,5 +18,5 @@ createRoot(document.getElementById("root")!).render(
       </AuthProvider>
     </ErrorBoundary>
   </BrowserRouter>
-  </>
+  </div>
 );

@@ -27,7 +27,7 @@ const Footer = () => {
   if (typeof error === 'object' && error !== null && 'message' in error) {
     const err = error as { response?: { data?: { message?: string } } };
     
-  const serverMessage = err.response?.data?.message || 'Server error occurred';
+  const serverMessage = err.response?.data?.message ?? 'Server error occurred';
   toast.error(serverMessage);
   } else {
     toast.error('An unknown error occurred');
@@ -55,12 +55,12 @@ const Footer = () => {
 
           {/* Company info */}
           <div>
-            <h3 className="text-lg font-bold text-blue-700 mb-5 flex items-center">
-              <span className="w-8 h-8 mr-2 rounded-full bg-blue-200 flex items-center justify-center">
-                <CheckCircle size={18} className="text-blue-600" />
-              </span>
-              TaskMate
+            <h3 className="text-lg font-bold text-blue-700 mb-5 flex items-center gap-2">
+  <span className="w-8 h-8 rounded-full bg-blue-200 flex items-center justify-center">
+    <CheckCircle size={18} className="text-blue-600" />
+  </span>TaskMate
             </h3>
+
             <p className="text-blue-800 text-sm leading-relaxed mb-6">
               Simplify your workflow, boost productivity, and achieve more with our intuitive task management solution.
             </p>

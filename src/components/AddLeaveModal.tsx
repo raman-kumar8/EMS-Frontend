@@ -58,7 +58,7 @@ const AddLeaveModal: React.FC<AddLeaveModalProps> = ({ open, onClose, onAddSucce
   if (typeof error === 'object' && error !== null && 'message' in error) {
    const err = error as { response?: { data?: { errors?: string } } };
     
-  const serverMessage = err.response?.data?.errors || 'Server error occurred';
+  const serverMessage = err.response?.data?.errors ?? 'Server error occurred';
   toast.error(serverMessage);
   } else {
     toast.error('An unknown error occurred');
@@ -77,30 +77,33 @@ const AddLeaveModal: React.FC<AddLeaveModalProps> = ({ open, onClose, onAddSucce
 
         <div className="grid gap-4 py-4">
           <div className="grid gap-2">
-            <label className="text-sm font-medium text-blue-900">Reason</label>
+            <label  className="text-sm font-medium text-blue-900">
             <Textarea
               placeholder="Enter reason for leave"
               value={form.reason}
               onChange={(e) => handleChange("reason", e.target.value)}
             />
+              Reason</label>
           </div>
 
           <div className="grid gap-2">
-            <label className="text-sm font-medium text-blue-900">Start Date</label>
+            <label className="text-sm font-medium text-blue-900">
             <Input
               type="date"
               value={form.startDate}
               onChange={(e) => handleChange("startDate", e.target.value)}
             />
+              Start Date</label>
           </div>
 
           <div className="grid gap-2">
-            <label className="text-sm font-medium text-blue-900">End Date</label>
+            <label className="text-sm font-medium text-blue-900">End Date
             <Input
               type="date"
               value={form.endDate}
               onChange={(e) => handleChange("endDate", e.target.value)}
             />
+            </label>
           </div>
         </div>
 

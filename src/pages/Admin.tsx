@@ -157,14 +157,14 @@ const Admin: React.FC = () => {
       PENDING: 'bg-yellow-500',
       APPROVED: 'bg-green-500',
       REJECTED: 'bg-red-500',
-    }[(status || '').toUpperCase()] || 'bg-gray-500');
+    }[(status ?? '').toUpperCase()] ?? 'bg-gray-500');
 
   const priorityColor = (p?: string) =>
     ({
       HIGH: 'text-red-400',
       MEDIUM: 'text-yellow-400',
       LOW: 'text-green-400',
-    }[(p || '').toUpperCase()] || 'text-gray-400');
+    }[(p ?? '').toUpperCase()] ?? 'text-gray-400');
 
   const initials = (name: string) =>
     name
@@ -225,7 +225,7 @@ const Admin: React.FC = () => {
                   </div>
                 ) : (
                   filtered.map((u) => (
-                    <div
+                    <button
                       key={u.id}
                       onClick={() => setSelectedUser(u)}
                       className="p-4 bg-gray-50 border border-gray-200 rounded-xl flex items-center space-x-4 hover:border-blue-400 hover:shadow transition cursor-pointer"
@@ -240,15 +240,15 @@ const Admin: React.FC = () => {
                       </div>
                       <div className="flex space-x-6">
                         <div className="text-center">
-                          <p className="font-semibold text-blue-600">{u.activeTasks || 0}</p>
+                          <p className="font-semibold text-blue-600">{u.activeTasks ?? 0}</p>
                           <p className="text-gray-500 text-xs">Active</p>
                         </div>
                         <div className="text-center">
-                          <p className="font-semibold text-green-600">{u.completedTasks || 0}</p>
+                          <p className="font-semibold text-green-600">{u.completedTasks ?? 0}</p>
                           <p className="text-gray-500 text-xs">Done</p>
                         </div>
                       </div>
-                    </div>
+                    </button>
                   ))
                 )}
               </div>
@@ -269,9 +269,10 @@ const Admin: React.FC = () => {
               </div>
               <div className="space-y-4 max-h-[600px] overflow-y-auto">
                 {(userTasks[selectedUser.id] ?? []).map((t) => (
+                   
                   <div key={t.id} className="p-4 bg-gray-50 border border-gray-200 rounded-xl">
                     <div className="flex items-center justify-between mb-2">
-                      <h3 className="text-lg font-medium text-gray-900">{t.title}</h3>
+                      <h3 className="text-lg font-medium text-gray-900">{t.taskName}</h3>
                       <span
                         className={`px-3 py-1 rounded-full text-xs font-semibold text-white ${badgeColor(
                           t.taskStatus
@@ -280,8 +281,9 @@ const Admin: React.FC = () => {
                         {t.taskStatus?.replace('-', ' ').toUpperCase()}
                       </span>
                     </div>
+                    
                     <div className="text-sm text-gray-600 flex items-center space-x-4">
-                      <span>Start: {new Date(t.start_time).toLocaleString()}</span>
+                      <span>Start: {t.startTime}</span>
                       <span className={priorityColor(t.priority)}>{t.priority} Priority</span>
                     </div>
                   </div>

@@ -50,7 +50,7 @@ const GenerateReportModal: React.FC<GenerateReportModalProps> = ({
   if (typeof error === 'object' && error !== null && 'message' in error) {
    const err = error as { response?: { data?: { message?: string } } };
     
-  const serverMessage = err.response?.data?.message || 'Server error occurred';
+  const serverMessage = err.response?.data?.message ?? 'Server error occurred';
   toast.error(serverMessage);
   } else {
     toast.error('An unknown error occurred');
@@ -92,21 +92,20 @@ const GenerateReportModal: React.FC<GenerateReportModalProps> = ({
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Report Name
-              </label>
-              <input
+                Report Name<input
                 type="text"
                 value={reportName}
                 onChange={(e) => setReportName(e.target.value)}
                 placeholder="Enter report name"
                 className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
+              </label>
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Select Tasks
-              </label>
+
               <div className="border border-gray-300 rounded-lg p-2 max-h-48 overflow-y-auto">
                 {tasks.map((task) => (
                   <label
@@ -122,6 +121,7 @@ const GenerateReportModal: React.FC<GenerateReportModalProps> = ({
                   </label>
                 ))}
               </div>
+              </label>
             </div>
 
             {error && <p className="text-sm text-red-600">{error}</p>}
