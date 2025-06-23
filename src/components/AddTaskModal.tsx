@@ -103,47 +103,52 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({
 
         <div className="grid gap-4 py-4">
           <div className="grid gap-2">
+
             <label className="text-sm font-medium text-blue-900">
+              Task Name
             <Input
               placeholder="Enter task name"
               value={form.taskName}
               onChange={(e) => handleChange("taskName", e.target.value)}
             />
-              Task Name</label>
+             </label>
           </div>
 
           <div className="grid gap-2">
             <label className="text-sm font-medium text-blue-900">
+              Description
             <Textarea
               placeholder="Write task description..."
               value={form.description}
               onChange={(e) => handleChange("description", e.target.value)}
             />
-              Description</label>
+              </label>
           </div>
 
           <div className="grid gap-2">
             <label className="text-sm font-medium text-blue-900">
+              Title
             <Input
               placeholder="Enter title"
               value={form.title}
               onChange={(e) => handleChange("title", e.target.value)}
             />
-              Title</label>
+             </label>
           </div>
 
           <div className="grid gap-2">
             <label className="text-sm font-medium text-blue-900">
+              Tag
             <Input
               placeholder="e.g. Frontend, Backend"
               value={form.taskTag}
               onChange={(e) => handleChange("taskTag", e.target.value)}
             />
-              Tag</label>
+              </label>
           </div>
 
           <div className="grid gap-2">
-            <label className="text-sm font-medium text-blue-900">Priority</label>
+            <label className="text-sm font-medium text-blue-900">Priority
             <Select
               value={form.priority}
               onValueChange={(value: TaskPriority) =>
@@ -159,10 +164,11 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({
                 <SelectItem value="HIGH">High</SelectItem>
               </SelectContent>
             </Select>
+            </label>
           </div>
 
           <div className="grid gap-2">
-            <label className="text-sm font-medium text-blue-900">Status</label>
+            <label className="text-sm font-medium text-blue-900">Status
             <Select
               value={form.taskStatus}
               onValueChange={(value: TaskStatus) =>
@@ -178,6 +184,7 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({
                 <SelectItem value="COMPLETED">Completed</SelectItem>
               </SelectContent>
             </Select>
+            </label>
           </div>
         </div>
 

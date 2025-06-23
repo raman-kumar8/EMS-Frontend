@@ -2,5 +2,5 @@ projectKey=ems-frontend
 serverUrl=http://localhost:9000
 serverVersion=25.6.0.109173
 dashboardUrl=http://localhost:9000/dashboard?id=ems-frontend
-ceTaskId=5b83c6e3-09bb-4d18-b3c2-62426de76ed4
-ceTaskUrl=http://localhost:9000/api/ce/task?id=5b83c6e3-09bb-4d18-b3c2-62426de76ed4
+ceTaskId=9262a45f-1689-4728-aa62-10e59a4c0240
+ceTaskUrl=http://localhost:9000/api/ce/task?id=9262a45f-1689-4728-aa62-10e59a4c0240
