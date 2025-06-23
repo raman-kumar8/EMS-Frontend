@@ -42,7 +42,7 @@ const fetchUserIdAndReports = async () => {
   if (typeof error === 'object' && error !== null && 'message' in error) {
     const err = error as { response?: { data?: { message?: string } } };
     
-  const serverMessage = err.response?.data?.message || 'Server error occurred';
+  const serverMessage = err.response?.data?.message ?? 'Server error occurred';
   toast.error(serverMessage);
   } else {
     toast.error('An unknown error occurred');
@@ -62,7 +62,7 @@ const fetchReport = async ()=>{
   if (typeof error === 'object' && error !== null && 'message' in error) {
      const err = error as { response?: { data?: { message?: string } } };
     
-  const serverMessage = err.response?.data?.message || 'Server error occurred';
+  const serverMessage = err.response?.data?.message ?? 'Server error occurred';
   toast.error(serverMessage);
   } else {
     toast.error('An unknown error occurred');
@@ -70,12 +70,12 @@ const fetchReport = async ()=>{
 }
 }
   useEffect(() => {
-   
+
 
 
     fetchUserIdAndReports();
   }, []);
- 
+
 
 useEffect(() => {
   if (!userId) return;
@@ -91,9 +91,9 @@ useEffect(() => {
 
   const channel = pusher.subscribe(`user-${userId}`);
   channel.bind('report-status-update', () => {
-   
+
     fetchReport();
-    
+
   });
 
   pusherRef.current = pusher;
@@ -103,19 +103,19 @@ useEffect(() => {
     channel.unsubscribe();
     pusher.disconnect();
   };
-}, [userId]);
+}, [userId,fetchReport]);
  const handleDelete = async(reportId:string)=>{
   try {
-        
+
     await axios.delete(`/reports/report/${reportId}`,{withCredentials:true});
-    
+
     fetchUserIdAndReports();
 
   }catch (error: unknown) {
   if (typeof error === 'object' && error !== null && 'message' in error) {
      const err = error as { response?: { data?: { message?: string } } };
-    
-  const serverMessage = err.response?.data?.message || 'Server error occurred';
+
+  const serverMessage = err.response?.data?.message ?? 'Server error occurred';
   toast.error(serverMessage);
   } else {
     toast.error('An unknown error occurred');
@@ -131,8 +131,8 @@ const handleGenerateReport = async (request: GenerateReportRequest) => {
   } catch (error: unknown) {
   if (typeof error === 'object' && error !== null && 'message' in error) {
      const err = error as { response?: { data?: { message?: string } } };
-    
-  const serverMessage = err.response?.data?.message || 'Server error occurred';
+
+  const serverMessage = err.response?.data?.message ?? 'Server error occurred';
   toast.error(serverMessage);
   } else {
     toast.error('An unknown error occurred');

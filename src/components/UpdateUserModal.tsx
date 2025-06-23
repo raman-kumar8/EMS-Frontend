@@ -55,7 +55,7 @@ const UpdateUserModal: React.FC<UpdateUserModalProps> = ({
   if (typeof error === 'object' && error !== null && 'message' in error) {
    const err = error as { response?: { data?: { message?: string } } };
     
-  const serverMessage = err.response?.data?.message || 'Server error occurred';
+  const serverMessage = err.response?.data?.message ?? 'Server error occurred';
   toast.error(serverMessage);
   } else {
     toast.error('An unknown error occurred');
@@ -74,22 +74,24 @@ const UpdateUserModal: React.FC<UpdateUserModalProps> = ({
 
         <div className="grid gap-4 py-4">
           <div className="grid gap-2">
-            <label className="text-sm font-medium text-green-900">New Name</label>
+            <label className="text-sm font-medium text-green-900">New Name
             <Input
               placeholder="Enter new name"
               value={form.name}
               onChange={(e) => handleChange("name", e.target.value)}
             />
+            </label>
           </div>
 
           <div className="grid gap-2">
-            <label className="text-sm font-medium text-green-900">New Email</label>
+            <label className="text-sm font-medium text-green-900">New Email
             <Input
               placeholder="Enter new email"
               type="email"
               value={form.email}
               onChange={(e) => handleChange("email", e.target.value)}
             />
+            </label>
           </div>
         </div>
 

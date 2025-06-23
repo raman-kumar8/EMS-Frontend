@@ -13,10 +13,11 @@ import type Task from "@/interfaces/Task.tsx";
 
 const Home = () => {
     const { user , fetchDetails } = useAuth();
-    const [, setUserId] = useState<string>("");
+
+  const [userId, setUserId] = useState<string>("");
     const navigate = useNavigate();
     const [taskList, setTaskList] = useState<Task[]>([]);
-    const [report, setReportList] = useState<Report[]>([]);
+    const [reportList, setReportList] = useState<Report[]>([]);
    
     const [showModal, setShowModal] = useState(false);
 
@@ -28,7 +29,7 @@ const Home = () => {
   if (typeof error === 'object' && error !== null && 'message' in error) {
      const err = error as { response?: { data?: { message?: string } } };
     
-  const serverMessage = err.response?.data?.message || 'Server error occurred';
+  const serverMessage = err.response?.data?.message ?? 'Server error occurred';
   toast.error(serverMessage);
   } else {
     toast.error('An unknown error occurred');
@@ -39,9 +40,10 @@ const Home = () => {
     const fetchUserIdAndReports = async () => {
         try {
             const { data: fetchedUserId } = await axios.get<string>('/users/general/validate', { withCredentials: true });
+
             setUserId(fetchedUserId);
 
-            const res = await axios.get(`/reports/report/user/${fetchedUserId}`, { withCredentials: true });
+            const res = await axios.get(`/reports/report/user/${userId}`, { withCredentials: true });
             const reportsData = res.data as Report[];
 
             setReportList(reportsData);
@@ -84,7 +86,7 @@ const Home = () => {
                             </div>
                             <div>
                                 <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">
-                                    Good morning, <span className="text-blue-600">{user?.name || 'User'}</span>
+                                    Good morning, <span className="text-blue-600">{user?.name ?? 'User'}</span>
                                 </h1>
                                 <p className="text-gray-600 font-medium mt-1">Ready to tackle today's challenges?</p>
                             </div>
@@ -104,14 +106,14 @@ const Home = () => {
                                     <div className="h-20 w-20 rounded-2xl bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center shadow-lg">
                                        <User className="h-8 w-8 text-white" />
                                     </div>
-                                    <h2 className="text-lg font-bold text-gray-900 mt-4">{user?.name || 'User Name'}</h2>
-                                    <p className="text-blue-600 font-semibold text-sm">{user?.role || 'Department'}</p>
+                                    <h2 className="text-lg font-bold text-gray-900 mt-4">{user?.name ?? 'User Name'}</h2>
+                                    <p className="text-blue-600 font-semibold text-sm">{user?.role ?? 'Department'}</p>
                                 </div>
                             </CardHeader>
                             <CardContent className="space-y-3 p-6">
                                 <div className="flex items-center gap-3 text-gray-700 p-3 rounded-lg bg-gray-50">
                                     <Mail className="h-4 w-4 text-gray-500" />
-                                    <span className="text-sm font-medium truncate">{user?.email || 'user@example.com'}</span>
+                                    <span className="text-sm font-medium truncate">{user?.email ?? 'user@example.com'}</span>
                                 </div>
                               
                               
@@ -141,7 +143,7 @@ const Home = () => {
                                     </div>
                                     <div>
                                         <p className="text-sm font-medium text-gray-600">Total Tasks</p>
-                                        <p className="text-2xl font-bold text-gray-900">{taskList?.length || 0}</p>
+                                        <p className="text-2xl font-bold text-gray-900">{taskList?.length ?? 0}</p>
                                     </div>
                                 </div>
                             </div>
@@ -177,7 +179,7 @@ const Home = () => {
                                     </div>
                                     <div>
                                         <p className="text-sm font-medium text-gray-600">Reports</p>
-                                        <p className="text-2xl font-bold text-gray-900">{report?.length || 0}</p>
+                                        <p className="text-2xl font-bold text-gray-900">{reportList?.length || 0}</p>
                                     </div>
                                 </div>
                             </div>
@@ -252,7 +254,7 @@ const Home = () => {
                                             <TrendingUp className="h-8 w-8 text-white" />
                                         </div>
                                         <div className="text-right">
-                                            <div className="text-3xl font-bold text-gray-900">{report?.length || 0}</div>
+                                            <div className="text-3xl font-bold text-gray-900">{reportList?.length ?? 0}</div>
                                             <div className="text-sm text-gray-500">Reports</div>
                                         </div>
                                     </div>

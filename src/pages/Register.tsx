@@ -24,7 +24,7 @@ import {
 import { Eye, EyeOff, Mail, User, UserPlus, Lock } from "lucide-react";
 import toast from "react-hot-toast";
 import { Input } from "@/components/ui/input.js";
-import type { AuthContextType } from "@/interfaces/AuthContextType";
+
 
 // 1. Define form schema and type
 const formSchema = z
@@ -59,7 +59,7 @@ type RegisterFormValues = z.infer<typeof formSchema>;
 // 3. Register component
 const Register = () => {
   const navigate = useNavigate();
-  const { user, loading } = useAuth() as AuthContextType;
+  const { user, loading } = useAuth() ;
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -183,12 +183,12 @@ const Register = () => {
                             {...field}
                           />
                         </FormControl>
-                        <div
+                        <button
                           onClick={() => setShowPassword(!showPassword)}
                           className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-400"
                         >
                           {showPassword ? <EyeOff /> : <Eye />}
-                        </div>
+                        </button>
                       </div>
                       <FormMessage />
                     </FormItem>
@@ -212,14 +212,14 @@ const Register = () => {
                             {...field}
                           />
                         </FormControl>
-                        <div
+                        <button
                           onClick={() =>
                             setShowConfirmPassword(!showConfirmPassword)
                           }
                           className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-400"
                         >
                           {showConfirmPassword ? <EyeOff /> : <Eye />}
-                        </div>
+                        </button>
                       </div>
                       <FormMessage />
                     </FormItem>
@@ -260,8 +260,7 @@ const Register = () => {
                 >
                   {isSubmitting ? (
                     <>
-                      <span className="mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-                      Creating Account...
+                      <span className="mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>Creating Account...
                     </>
                   ) : (
                     <>

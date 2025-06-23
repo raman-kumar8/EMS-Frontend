@@ -9,7 +9,7 @@ import {
   useContext,
   useEffect,
   useState,
-  type ReactNode,
+  type ReactNode, useMemo,
 } from "react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
@@ -32,7 +32,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       });
       setUser(response.data);
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (error:unknown) {
+    } catch (error) {
+      console.log(error);
       setUser(null);
     } finally {
       setLoading(false);
@@ -54,7 +55,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       } catch (error) {
         const err = error as { response?: { data?: { message?: string } } };
     
-  const serverMessage = err.response?.data?.message || 'Server error occurred';
+  const serverMessage = err.response?.data?.message ?? 'Server error occurred';
   toast.error(serverMessage);
       }
     };
@@ -63,7 +64,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   return (
     <AuthContext.Provider
-      value={{ user, setUser, loading, logout, fetchDetails }}
+      value={useMemo(
+        () => ({ user, setUser, loading, logout, fetchDetails }),
+        [user, loading, logout, fetchDetails] // update this list as needed
+      )}
     >
       {children}
     </AuthContext.Provider>

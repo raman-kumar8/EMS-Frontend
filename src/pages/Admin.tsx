@@ -157,14 +157,14 @@ const Admin: React.FC = () => {
       PENDING: 'bg-yellow-500',
       APPROVED: 'bg-green-500',
       REJECTED: 'bg-red-500',
-    }[(status || '').toUpperCase()] || 'bg-gray-500');
+    }[(status ?? '').toUpperCase()] ?? 'bg-gray-500');
 
   const priorityColor = (p?: string) =>
     ({
       HIGH: 'text-red-400',
       MEDIUM: 'text-yellow-400',
       LOW: 'text-green-400',
-    }[(p || '').toUpperCase()] || 'text-gray-400');
+    }[(p ?? '').toUpperCase()] ?? 'text-gray-400');
 
   const initials = (name: string) =>
     name
@@ -172,6 +172,69 @@ const Admin: React.FC = () => {
       .map((w) => w[0])
       .slice(0, 2)
       .join('');
+  const renderPendingLeaves = () => {
+    if (loading.leaves) {
+      return (
+        <div className="flex justify-center py-10">
+          <LoadingSpinner />
+        </div>
+      );
+    }
+
+    if (pendingLeaves.length === 0) {
+      return (
+        <p className="text-center text-gray-500 py-10">
+          All clear—no pending requests!
+        </p>
+      );
+    }
+
+    return (
+      <div className="space-y-4">
+        {pendingLeaves.map((l) => (
+          <div
+            key={l.leaveId}
+            className="p-4 bg-gray-50 border border-gray-200 rounded-xl space-y-2"
+          >
+            <p className="font-medium">
+              {l.user.name} ({l.user.role})
+            </p>
+            <p className="text-sm text-gray-500">Email: {l.user.email}</p>
+            <p className="text-sm text-gray-500">
+              Leaves left: {l.user.leaveCount ?? 0}
+            </p>
+            <p className="text-sm text-gray-500">
+              Dates: {formatDateRange(l.startDate, l.endDate)}
+            </p>
+            <p className="text-sm text-gray-500">Reason: {l.reason}</p>
+            <span
+              className={`inline-block px-2 py-1 text-xs font-semibold text-white rounded ${badgeColor(
+                l.status
+              )}`}
+            >
+            {l.status?.toUpperCase()}
+          </span>
+            <div className="flex space-x-4 mt-3">
+              <button
+                onClick={() => handleLeaveAction(l.leaveId, 'approve')}
+                disabled={loading.leaveAction}
+                className="flex items-center px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-xl transition"
+              >
+                <Check className="mr-1" /> Approve
+              </button>
+              <button
+                onClick={() => handleLeaveAction(l.leaveId, 'reject')}
+                disabled={loading.leaveAction}
+                className="flex items-center px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-xl transition"
+              >
+                <X className="mr-1" /> Reject
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 p-8">
@@ -225,7 +288,7 @@ const Admin: React.FC = () => {
                   </div>
                 ) : (
                   filtered.map((u) => (
-                    <div
+                    <button
                       key={u.id}
                       onClick={() => setSelectedUser(u)}
                       className="p-4 bg-gray-50 border border-gray-200 rounded-xl flex items-center space-x-4 hover:border-blue-400 hover:shadow transition cursor-pointer"
@@ -240,15 +303,15 @@ const Admin: React.FC = () => {
                       </div>
                       <div className="flex space-x-6">
                         <div className="text-center">
-                          <p className="font-semibold text-blue-600">{u.activeTasks || 0}</p>
+                          <p className="font-semibold text-blue-600">{u.activeTasks ?? 0}</p>
                           <p className="text-gray-500 text-xs">Active</p>
                         </div>
                         <div className="text-center">
-                          <p className="font-semibold text-green-600">{u.completedTasks || 0}</p>
+                          <p className="font-semibold text-green-600">{u.completedTasks ?? 0}</p>
                           <p className="text-gray-500 text-xs">Done</p>
                         </div>
                       </div>
-                    </div>
+                    </button>
                   ))
                 )}
               </div>
@@ -269,9 +332,10 @@ const Admin: React.FC = () => {
               </div>
               <div className="space-y-4 max-h-[600px] overflow-y-auto">
                 {(userTasks[selectedUser.id] ?? []).map((t) => (
+                   
                   <div key={t.id} className="p-4 bg-gray-50 border border-gray-200 rounded-xl">
                     <div className="flex items-center justify-between mb-2">
-                      <h3 className="text-lg font-medium text-gray-900">{t.title}</h3>
+                      <h3 className="text-lg font-medium text-gray-900">{t.taskName}</h3>
                       <span
                         className={`px-3 py-1 rounded-full text-xs font-semibold text-white ${badgeColor(
                           t.taskStatus
@@ -280,8 +344,9 @@ const Admin: React.FC = () => {
                         {t.taskStatus?.replace('-', ' ').toUpperCase()}
                       </span>
                     </div>
+                    
                     <div className="text-sm text-gray-600 flex items-center space-x-4">
-                      <span>Start: {new Date(t.start_time).toLocaleString()}</span>
+                      <span>Start: {t.startTime}</span>
                       <span className={priorityColor(t.priority)}>{t.priority} Priority</span>
                     </div>
                   </div>
@@ -294,8 +359,9 @@ const Admin: React.FC = () => {
         {/* Sidebar */}
         <div className="space-y-6 ">
           {/* Pending leaves */}
-          <div className="bg-white rounded-2xl  shadow-md border border-gray-200 p-6 min-h-full overflow-y-auto ">
-            <div className="flex justify-between items-center mb-4 " >
+          {/* Pending leaves */}
+          <div className="bg-white rounded-2xl shadow-md border border-gray-200 p-6 min-h-full overflow-y-auto">
+            <div className="flex justify-between items-center mb-4">
               <h3 className="text-xl font-semibold text-gray-900">Pending Leaves</h3>
               <button
                 onClick={fetchLeaveRequests}
@@ -305,51 +371,9 @@ const Admin: React.FC = () => {
                 {loading.leaves ? <LoadingSpinner /> : 'Refresh'}
               </button>
             </div>
-            {loading.leaves ? (
-              <div className="flex justify-center py-10">
-                <LoadingSpinner />
-              </div>
-            ) : pendingLeaves.length === 0 ? (
-              <p className="text-center text-gray-500 py-10">All clear—no pending requests!</p>
-            ) : (
-              <div className="space-y-4">
-                {pendingLeaves.map((l) => (
-                  <div key={l.leaveId} className="p-4 bg-gray-50 border border-gray-200 rounded-xl space-y-2">
-                    <p className="font-medium">{l.user.name} ({l.user.role})</p>
-                    <p className="text-sm text-gray-500">Email: {l.user.email}</p>
-                    <p className="text-sm text-gray-500">Leaves left: {l.user.leaveCount ?? 0}</p>
-                    <p className="text-sm text-gray-500">
-                      Dates: {formatDateRange(l.startDate, l.endDate)}
-                    </p>
-                    <p className="text-sm text-gray-500">Reason: {l.reason}</p>
-                    <span
-                      className={`inline-block px-2 py-1 text-xs font-semibold text-white rounded ${badgeColor(
-                        l.status
-                      )}`}
-                    >
-                      {l.status?.toUpperCase()}
-                    </span>
-                    <div className="flex space-x-4 mt-3">
-                      <button
-                        onClick={() => handleLeaveAction(l.leaveId, 'approve')}
-                        disabled={loading.leaveAction}
-                        className="flex items-center px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-xl transition"
-                      >
-                        <Check className="mr-1" /> Approve
-                      </button>
-                      <button
-                        onClick={() => handleLeaveAction(l.leaveId, 'reject')}
-                        disabled={loading.leaveAction}
-                        className="flex items-center px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-xl transition"
-                      >
-                        <X className="mr-1" /> Reject
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
+            {renderPendingLeaves()}
           </div>
+
           {/* Task generation placeholder */}
           
         </div>
