@@ -11,10 +11,11 @@ import {
 import axios from "axios";
 import toast from "react-hot-toast";
 
-import TaskComponent from "../components/TaskComponent";
+
 import type Task from "@/interfaces/Task";
 import { Button } from "@/components/ui/button";
 import AdminTaskModal from "@/components/AdminTaskModal";
+import TaskAdminComponent from "@/components/TaskAdminComponent.tsx";
 
 
 const TaskAdminPage: React.FC = () => {
@@ -25,9 +26,9 @@ const TaskAdminPage: React.FC = () => {
  
   const fetchList = async () => {
     try {
-      const res = await axios.get<Task[]>(`/tasks/getAll`, { withCredentials: true });
+      const res = await axios.get<Task[]>(`/tasks/admin/getAll`, { withCredentials: true });
       setTaskList(res.data);
-    
+
     } catch (error: unknown) {
       if (typeof error === "object" && error !== null && "message" in error) {
         toast.error((error as { message: string }).message);
@@ -125,10 +126,10 @@ const TaskAdminPage: React.FC = () => {
         {filteredTasks.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredTasks.map((task) => (
-              <TaskComponent
+              <TaskAdminComponent
                 key={task.id}
                 task={task}
-                onEdit={() => {}}
+
                 onUpdate={fetchList}
               />
             ))}

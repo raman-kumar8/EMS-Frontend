@@ -1,15 +1,18 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from "react";
 import {
   Calendar,
   Clock,
   CheckCircle,
   Download,
   Eye,
-  Trash2,
+
   AlertCircle,
-  Loader,
-} from 'lucide-react';
+  Loader, BadgeCheck,
+} from "lucide-react";
 import dayjs from 'dayjs';
+import type User from "@/interfaces/User.tsx";
+import toast from "react-hot-toast";
+import axios from "axios";
 
 interface Report {
   reportId: string;
@@ -56,12 +59,13 @@ const statusConfig = {
 
 interface ReportCardProps {
   report: Report;
-  onDelete?: (id: string) => void;
+
+
 }
 
-const ReportCard: React.FC<ReportCardProps> = ({ report, onDelete }) => {
-  const [isDeleting, setIsDeleting] = useState(false);
+const ReportCard: React.FC<ReportCardProps> = ({ report  }) => {
 
+ const [name,setName] = useState<string>("");
   const StatusIcon = statusConfig[report.status].icon;
   const status = statusConfig[report.status];
 
@@ -72,29 +76,53 @@ const ReportCard: React.FC<ReportCardProps> = ({ report, onDelete }) => {
   const generatedTime = report.generatedTime
     ? dayjs(report.generatedTime, 'HH:mm:ss.SSS').format('hh:mm:ss A') // Added A for AM/PM
     : '';
+  const findUserNameById = async (id:string)=>{
+    try {
+      const response = await  axios.get<User>(`/users/general/id/${id}`)
 
-  const handleDelete = () => {
-    setIsDeleting(true);
-    // Simulate API call
-    setTimeout(() => {
-      onDelete?.(report.reportId);
-      setIsDeleting(false);
-    }, 1000);
-  };
+      return response.data.name.toUpperCase();
+    }catch (error: unknown) {
+      console.log(error)
+      if (typeof error === "object" && error !== null && "message" in error) {
+        const err = error as { response?: { data?: { message?: string } } };
+        const serverMessage = err.response?.data?.message ?? 'Server error occurred';
+        toast.error(serverMessage);
+      } else {
+        toast.error('An unknown error occurred');
+      }
+    }
+
+  }
+  useEffect(() => {
+    const getUserName = async () => {
+      const name = await findUserNameById(report.userId);
+      console.log(name)
+      setName(name ?? "User");
+    };
+
+    getUserName();
+  }, [report.userId]);
+
 
   return (
     <div className="bg-white/80 backdrop-blur-md rounded-2xl border border-gray-200 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 overflow-hidden">
       {/* Header Section */}
       <div className="px-6 pt-6 pb-4 flex justify-between items-start">
-        <div className="flex-1 pr-4">
+        <div className="flex-1 pr-4 flex flex-col items-center justify-center space-x-3">
           <h3 className="text-xl font-bold text-gray-900 leading-tight mb-2 truncate">
             {report.reportName || 'Untitled Report'}
           </h3>
-          <div
-            className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold ${status.bg} ${status.color} border ${status.border}`}
-          >
-            <StatusIcon className={`w-4 h-4 ${report.status === 'PROCESSING' ? 'animate-spin' : ''}`} />
-            <span className="capitalize">{report.status.toLowerCase()}</span>
+          <div className="flex items-center space-x-6 justify-evenly">
+            <h3 className="text-xl text-blue-500 flex space-x-3 items-center justify-center">
+              <BadgeCheck/>
+               By {name.toUpperCase() ?? 'Name Not Specified'}
+            </h3>
+            <div
+              className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold ${status.bg} ${status.color} border ${status.border}`}
+            >
+              <StatusIcon className={`w-4 h-4 ${report.status === 'PROCESSING' ? 'animate-spin' : ''}`} />
+              <span className="capitalize">{report.status.toLowerCase()}</span>
+            </div>
           </div>
         </div>
         {/* Potentially add more header elements here like a kaba menu etc */}
@@ -163,22 +191,7 @@ const ReportCard: React.FC<ReportCardProps> = ({ report, onDelete }) => {
           </>
         )}
 
-        <button
-          onClick={() => {
-            if (window.confirm('Are you sure you want to delete this report permanently?')) {
-              handleDelete();
-            }
-          }}
-          disabled={isDeleting}
-          className={`flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium rounded-lg shadow-sm transition-all duration-200 ${
-            isDeleting
-              ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
-              : 'bg-red-500 hover:bg-red-600 text-white'
-          }`}
-        >
-          <Trash2 size={16} />
-          {isDeleting ? 'Deleting...' : 'Delete'}
-        </button>
+
       </div>
     </div>
   );

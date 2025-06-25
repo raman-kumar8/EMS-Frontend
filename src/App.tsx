@@ -7,13 +7,13 @@ import ProtectedRoute from "./components/ProtectedRoute"
 import PublicRoute from "./components/PublicRoute"
 
 import NotFound from "./pages/NotFound"
-import ReportPage from "./pages/ReportPage"
 import AboutUs from "./pages/AboutUs"
 import LeavePage from "./pages/LeavePage"
 import ForgetPassword from "./pages/ForgetPassword"
 import ResetPassword from "./pages/ResetPassword"
 import HomePage from "./pages/HomePage"
 import TaskRoutePage from "./pages/TaskRoutePage"
+import ReportRoutePage from "@/pages/ReportRoutePage.tsx";
 
 const App = () => {
     return <div>
@@ -33,7 +33,7 @@ const App = () => {
       }/>
       <Route path="/report" element = {
         <ProtectedRoute>
-            <ReportPage/>
+            <ReportRoutePage/>
         </ProtectedRoute>
       }/>
       <Route path="/about" element={

@@ -132,7 +132,7 @@ const AdminTaskModal: React.FC<AddAdminTaskModalProps> = ({
             </div>
 
             {users.length > 0 && (
-              <div className="border rounded-md p-2 max-h-60 overflow-y-auto">
+              <div className="border rounded-md p-2 max-h-60 flex flex-col overflow-y-auto">
                 {users.map((user) => (
                   <button
 

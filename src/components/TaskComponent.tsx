@@ -121,7 +121,7 @@ const TaskComponent: React.FC<TaskComponentProps> = ({ task, onUpdate, onEdit })
   };
 
   const StatusIcon = statusConfig[localStatus]?.icon || Pause;
- console.log(task)
+
   return (
     <div className="group w-full max-w-2xl mx-auto mb-6 relative">
       <div className="bg-white rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 overflow-hidden">

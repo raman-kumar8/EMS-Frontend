@@ -42,15 +42,17 @@ const Home = () => {
             const { data: fetchedUserId } = await axios.get<string>('/users/general/validate', { withCredentials: true });
 
             setUserId(fetchedUserId);
-
-            const res = await axios.get(`/reports/report/user/${userId}`, { withCredentials: true });
+            console.log(userId);
+            
+            const res = await axios.get(`/reports/report/user/${fetchedUserId}`, { withCredentials: true });
             const reportsData = res.data as Report[];
 
             setReportList(reportsData);
         }catch (error: unknown) {
+          console.log(error)
   if (typeof error === 'object' && error !== null && 'message' in error) {
     const message = (error as { message: string }).message;
-    toast.error(message);
+    console.log(message)
   } else {
     toast.error('An unknown error occurred');
   }
